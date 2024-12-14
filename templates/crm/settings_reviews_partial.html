@@ -1,0 +1,190 @@
+{% macro render(data) -%}
+
+<script>
+
+    function reviews_data() {
+
+        let savedTestimonials = [
+            {
+                id: 1,
+                person_name: null,
+                occupation: null,
+                testimonial: null,
+            }
+        ]
+
+        let savedData = {{ data.testimonials | tojson
+    }}
+
+    if (savedData) {
+        savedTestimonials = savedData
+    }
+
+    return {
+        loading: false,
+        success_message: null,
+        error_message: null,
+        testimonials: savedTestimonials,
+        reviewUrl: document.location.origin + '/crm/static/reviews',
+        save: async function () {
+
+            this.loading = true
+            this.success_message = null
+            this.error_message = null
+
+            let payload = this.testimonials
+
+            const response = await fetch(this.reviewUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+
+            const result = await response.json()
+
+            this.loading = false
+
+            if (result.status_code == 200) {
+                this.success_message = result.content
+                setTimeout(() => { this.success_message = null }, 3000)
+            } else {
+                this.error_message = result.content
+                setTimeout(() => { this.error_message = null }, 3000)
+            }
+
+        }
+    }
+    }
+
+</script>
+
+
+<div x-data="reviews_data">
+
+    <form @submit.prevent="save" x-cloak x-bind:class="activeSection == 'reviews' ? '': 'is-hidden'"
+        class="box has-background-light mt-6">
+
+        <hgroup class="mb-6">
+            <h1 class="title is-5 is-family-monospace mb-2">Sectiune Testimoniale</h1>
+            <p class="mb-2">
+                Aici puteti adauga ce spun clientii dvs. despre serviciile oferite.
+            </p>
+            <figure>
+                <img loading="lazy" class="image" src="/public/crm/sections/5reviews.png" alt="reviews">
+            </figure>
+        </hgroup>
+
+
+        <template x-for="entry in testimonials" :key="entry.id">
+
+            <div class="mt-6">
+
+                <div class="columns">
+
+                    <div class="field column">
+                        <label class="label">Nume Client <span x-text="entry.id"></span></label>
+                        <div class="control">
+                            <input x-model="entry.person_name" class="input" type="text"
+                                placeholder="Ex: Andrei Costarca"></input>
+                        </div>
+                    </div>
+
+                    <div class="field column">
+                        <label class="label">Ocupatie</label>
+                        <div class="control">
+                            <input x-model="entry.occupation" class="input" type="text"
+                                placeholder="Ex: Software developer"></input>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="field">
+                    <label class="label">Testimonial/Review</label>
+                    <div class="control">
+                        <textarea x-model="entry.testimonial" class="textarea"
+                            placeholder="Ex: Sunt niste profesionisti!"></textarea>
+                    </div>
+                </div>
+
+
+                <div class="field buttons is-grouped is-grouped-right">
+
+                    <button @click.prevent="testimonials = [
+                ...testimonials, 
+                {   id: testimonials.length + 1, 
+                    person_name: null,
+                    occupation: null,
+                    testimonial: null,
+                }]" class="button is-link is-light">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                        </svg>
+
+                    </button>
+
+                    <button @click.prevent="testimonials = testimonials.filter(elem => {
+                        if (testimonials.length > 1){
+                            return elem.id != entry.id
+                        } else {
+                            elem.id = 1
+                            elem.person_name = null
+                            elem.occupation = null
+                            elem.testimonial = null
+                            return true
+                        }
+                    })" class="button is-light is-danger ml-2">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8" />
+                        </svg>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </template>
+
+
+        <div class="field is-grouped is-grouped-right mt-6">
+            <button type="submit" x-bind:class="loading ? 'is-loading' : ''" class="button is-link">
+                Salveaza testimoniale
+            </button>
+        </div>
+
+    </form>
+
+
+    <div x-cloak x-bind:class="error_message != null ? '': 'is-hidden'" class="notification is-danger" style="
+position: fixed;
+bottom: 2rem;
+max-width: 600px;
+left: 1rem;
+">
+        <button x-on:click="error_message = null" class="delete"></button>
+        <p x-text="error_message"></p>
+    </div>
+
+    <div x-cloak x-bind:class="success_message != null ? '': 'is-hidden'" class="notification is-success" style="
+    position: fixed;
+    bottom: 2rem;
+    max-width: 600px;
+    left: 1rem;
+    ">
+        <button x-on:click="success_message = null" class="delete"></button>
+        <p x-text="success_message"></p>
+    </div>
+
+</div>
+
+
+{%- endmacro %}

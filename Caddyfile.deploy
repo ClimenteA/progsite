@@ -1,0 +1,23 @@
+progsite.ro {
+
+	tls your-domain-email@here.com
+
+	reverse_proxy app:3000
+	redir /sitemap.xml /public/crm/sitemap.xml
+	redir /robots.txt /public/crm/robots.txt
+	redir / /crm/landing
+
+	encode zstd gzip
+	templates
+	file_server browse
+
+}
+
+
+admin.softgata.com {
+	
+	tls your-domain-email@here.com
+
+	reverse_proxy /mongo-express* mongo-express:8081
+	redir / /mongo-express
+}

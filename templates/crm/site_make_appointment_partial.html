@@ -1,0 +1,17 @@
+{% import "crm/site_services_cards_partial.html" as service_cards %}
+
+
+{% macro render(data) -%}
+
+
+
+<hgroup class="mt-6 mx-1">
+    <h1 class="title is-4">Alege serviciul dorit</h1>
+    <h2 class="subtitle is-6">Selecteaza pe serviciul dorit apoi da click pe butonul "Vreau o programare ✋"</h2>
+</hgroup>
+
+
+{{ service_cards.render(data) }}
+
+
+{%- endmacro %}

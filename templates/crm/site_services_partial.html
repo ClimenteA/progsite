@@ -1,0 +1,24 @@
+{% import "crm/site_services_cards_partial.html" as service_cards %}
+
+
+{% macro render(data) -%}
+
+<div class="container" style="border-bottom: 1px solid lightgray;"></div>
+
+
+<section id="services" class="container px-1">
+
+    <hgroup class="is-flex is-flex-direction-column is-align-items-center py-6">
+        <h1 class="title is-family-monospace">SERVICII</h1>
+        <h2 class="subtitle has-text-grey-dark has-text-centered mt-2 is-size-6-mobile">
+            Iata o lista cu serviciile pe care le putem oferi.
+            Dati click pe numele serviciului pentru a vedea mai multe detalii.
+        </h2>
+    </hgroup>
+
+    {{ service_cards.render(data) }}
+
+</section>
+
+
+{%- endmacro %}

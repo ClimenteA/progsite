@@ -1,0 +1,583 @@
+{% macro render(data) -%}
+
+
+<script>
+
+
+    function schedule() {
+        
+        let mondayEntries = [
+            { id: 1, start: null, stop: null },
+        ]
+        let savedMondayEntries = {{ data.working_schedule.monday_entries | tojson }}
+        if (savedMondayEntries) {
+            mondayEntries = savedMondayEntries
+        }
+
+        let tuesdayEntries = [
+            { id: 1, start: null, stop: null },
+        ]
+        let savedTuesdayEntries = {{ data.working_schedule.tuesday_entries | tojson }}
+        if (savedTuesdayEntries) {
+            tuesdayEntries = savedTuesdayEntries
+        }
+
+        let wednesdayEntries = [
+            { id: 1, start: null, stop: null },
+        ]
+        let savedWednesdayEntries = {{ data.working_schedule.wednesday_entries | tojson }}
+        if (savedWednesdayEntries) {
+            wednesdayEntries = savedWednesdayEntries
+        }
+
+        let thursdayEntries = [
+            { id: 1, start: null, stop: null },
+        ]
+        let savedThursdayEntries = {{ data.working_schedule.thursday_entries | tojson }}
+        if (savedThursdayEntries) {
+            thursdayEntries = savedThursdayEntries
+        }
+
+        let fridayEntries = [
+            { id: 1, start: null, stop: null },
+        ]
+        let savedFridayEntries = {{ data.working_schedule.friday_entries | tojson }}
+        if (savedFridayEntries) {
+            fridayEntries = savedFridayEntries
+        }
+
+        let saturdayEntries = [
+            { id: 1, start: null, stop: null },
+        ]
+        let savedSaturdayEntries = {{ data.working_schedule.saturday_entries | tojson }}
+        if (savedSaturdayEntries) {
+            saturdayEntries = savedSaturdayEntries
+        }
+
+        let sundayEntries = [
+            { id: 1, start: null, stop: null },
+        ]
+        let savedSundayEntries = {{ data.working_schedule.sunday_entries | tojson }}
+        if (savedSundayEntries) {
+            sundayEntries = savedSundayEntries
+        }
+
+
+        let leMentions = null
+        let savedMentions = {{ data.working_schedule.mentions | tojson }}
+        if (savedMentions) {
+            leMentions = savedMentions
+        }
+
+        return {
+            loading: false,
+            success_message: null,
+            error_message: null,
+            monday_entries: mondayEntries,
+            tuesday_entries: tuesdayEntries,
+            wednesday_entries: wednesdayEntries,
+            thursday_entries: thursdayEntries,
+            friday_entries: fridayEntries,
+            saturday_entries: saturdayEntries,
+            sunday_entries: sundayEntries,
+            mentions: leMentions,
+            scheduleUrl: document.location.origin + '/crm/static/schedule',
+            save: async function () {
+
+                this.loading = true
+                this.success_message = null
+                this.error_message = null
+
+                const payload = {
+                    monday_entries: this.monday_entries,
+                    tuesday_entries: this.tuesday_entries,
+                    wednesday_entries: this.wednesday_entries,
+                    thursday_entries: this.thursday_entries,
+                    friday_entries: this.friday_entries,
+                    saturday_entries: this.saturday_entries,
+                    sunday_entries: this.sunday_entries,
+                    mentions: this.mentions
+                }
+
+                const response = await fetch(this.scheduleUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+
+                const result = await response.json()
+
+                this.loading = false
+
+                if (result.status_code == 200) {
+                    this.success_message = result.content
+                    setTimeout(() => { this.success_message = null }, 3000)
+                } else {
+                    if (result.content){
+                        this.error_message = result.content
+                    }
+                    
+                    if (result.detail){
+                        this.error_message = "Orele se suprapun. Aveti grija ca orele sa fie in ordine cronologica pentru fiecare zi."
+                    }
+                    
+                    setTimeout(() => { this.error_message = null }, 3000)
+                }
+            }
+        }
+    }
+
+</script>
+
+
+
+<div x-data="schedule">
+    <form @submit.prevent="save" x-cloak x-bind:class="activeSection == 'schedule' ? '': 'is-hidden'"
+        class="box has-background-light mt-6">
+
+        <hgroup class="mb-6">
+            <h1 class="title is-5 is-family-monospace mb-2">Sectiune program de lucru</h1>
+            <p class="mb-2">
+                Introduceti programul de lucru pe care il aveti pentru fiecare zi.
+                Daca nu lucrati de exemplu Sambata/Duminica lasati necompletat.
+            </p>
+            <figure>
+                <img loading="lazy" class="image" src="/public/crm/sections/8contact.png" alt="contact details">
+            </figure>
+        </hgroup>
+
+
+        <template x-for="entry in monday_entries" :key="entry.id">
+
+            <div class="columns is-align-items-center">
+
+                <div class="column field">
+                    <label class="label">Luni Start <span x-text="entry.id"></span></label>
+                    <div class="control">
+                        <input class="input" x-model="entry.start" type="time">
+                    </div>
+                </div>
+
+                <div class="column field">
+                    <label class="label">Luni Stop <span x-text="entry.id"></span></label>
+                    <div class="control">
+                        <input class="input" x-model="entry.stop" type="time">
+                    </div>
+                </div>
+
+                <button
+                    @click.prevent="monday_entries = [...monday_entries, { id: monday_entries.length + 1, start: null, stop: null }]"
+                    class="button is-link is-light mt-4">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path
+                            d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                    </svg>
+
+                </button>
+
+
+                <button @click.prevent="monday_entries = monday_entries.filter(elem => {
+                    if (elem.id == 1) {
+                        entry.start = null
+                        entry.stop = null
+                        return true
+                    } else {
+                        return elem.id != entry.id
+                    }
+                });"
+                    class="button is-light mt-4 ml-2 is-danger">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8" />
+                    </svg>
+
+                </button>
+
+            </div>
+
+        </template>
+
+
+        <template x-for="entry in tuesday_entries" :key="entry.id">
+
+            <div class="columns is-align-items-center">
+
+                <div class="column field">
+                    <label class="label">Marti Start <span x-text="entry.id"></span></label>
+                    <div class="control">
+                        <input class="input" x-model="entry.start" type="time">
+                    </div>
+                </div>
+
+                <div class="column field">
+                    <label class="label">Marti Stop <span x-text="entry.id"></span></label>
+                    <div class="control">
+                        <input class="input" x-model="entry.stop" type="time">
+                    </div>
+                </div>
+
+                <button
+                    @click.prevent="tuesday_entries = [...tuesday_entries, { id: tuesday_entries.length + 1, start: null, stop: null }]"
+                    class="button is-link is-light mt-4">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path
+                            d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                    </svg>
+
+                </button>
+
+
+                <button @click.prevent="tuesday_entries = tuesday_entries.filter(elem => {
+                    if (elem.id == 1) {
+                        entry.start = null
+                        entry.stop = null
+                        return true
+                    } else {
+                        return elem.id != entry.id
+                    }
+                });"
+                    class="button is-light mt-4 ml-2 is-danger" 
+                    >
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8" />
+                    </svg>
+
+                </button>
+
+            </div>
+
+        </template>
+
+
+        <template x-for="entry in wednesday_entries" :key="entry.id">
+
+            <div class="columns is-align-items-center">
+
+                <div class="column field">
+                    <label class="label">Miercuri Start <span x-text="entry.id"></span></label>
+                    <div class="control">
+                        <input class="input" x-model="entry.start" type="time">
+                    </div>
+                </div>
+
+                <div class="column field">
+                    <label class="label">Miercuri Stop <span x-text="entry.id"></span></label>
+                    <div class="control">
+                        <input class="input" x-model="entry.stop" type="time">
+                    </div>
+                </div>
+
+                <button
+                    @click.prevent="wednesday_entries = [...wednesday_entries, { id: wednesday_entries.length + 1, start: null, stop: null }]"
+                    class="button is-link is-light mt-4">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path
+                            d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                    </svg>
+
+                </button>
+
+
+                <button @click.prevent="wednesday_entries = wednesday_entries.filter(elem => {
+                    if (elem.id == 1) {
+                        entry.start = null
+                        entry.stop = null
+                        return true
+                    } else {
+                        return elem.id != entry.id
+                    }
+                });"
+                    class="button is-light mt-4 ml-2 is-danger" 
+                    >
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8" />
+                    </svg>
+
+                </button>
+
+            </div>
+
+        </template>
+
+
+
+        <template x-for="entry in thursday_entries" :key="entry.id">
+
+            <div class="columns is-align-items-center">
+
+                <div class="column field">
+                    <label class="label">Joi Start <span x-text="entry.id"></span></label>
+                    <div class="control">
+                        <input class="input" x-model="entry.start" type="time">
+                    </div>
+                </div>
+
+                <div class="column field">
+                    <label class="label">Joi Stop <span x-text="entry.id"></span></label>
+                    <div class="control">
+                        <input class="input" x-model="entry.stop" type="time">
+                    </div>
+                </div>
+
+                <button
+                    @click.prevent="thursday_entries = [...thursday_entries, { id: thursday_entries.length + 1, start: null, stop: null }]"
+                    class="button is-link is-light mt-4">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path
+                            d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                    </svg>
+
+                </button>
+
+
+                <button @click.prevent="thursday_entries = thursday_entries.filter(elem => {
+                    if (elem.id == 1) {
+                        entry.start = null
+                        entry.stop = null
+                        return true
+                    } else {
+                        return elem.id != entry.id
+                    }
+                });"
+                    class="button is-light mt-4 ml-2 is-danger" 
+                    >
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8" />
+                    </svg>
+
+                </button>
+
+            </div>
+
+        </template>
+
+
+
+        <template x-for="entry in friday_entries" :key="entry.id">
+
+            <div class="columns is-align-items-center">
+
+                <div class="column field">
+                    <label class="label">Vineri Start <span x-text="entry.id"></span></label>
+                    <div class="control">
+                        <input class="input" x-model="entry.start" type="time">
+                    </div>
+                </div>
+
+                <div class="column field">
+                    <label class="label">Vineri Stop <span x-text="entry.id"></span></label>
+                    <div class="control">
+                        <input class="input" x-model="entry.stop" type="time">
+                    </div>
+                </div>
+
+                <button
+                    @click.prevent="friday_entries = [...friday_entries, { id: friday_entries.length + 1, start: null, stop: null }]"
+                    class="button is-link is-light mt-4">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path
+                            d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                    </svg>
+
+                </button>
+
+
+                <button @click.prevent="friday_entries = friday_entries.filter(elem => {
+                    if (elem.id == 1) {
+                        entry.start = null
+                        entry.stop = null
+                        return true
+                    } else {
+                        return elem.id != entry.id
+                    }
+                });"
+                    class="button is-light mt-4 ml-2 is-danger" 
+                    >
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8" />
+                    </svg>
+
+                </button>
+
+            </div>
+
+        </template>
+
+
+
+        <template x-for="entry in saturday_entries" :key="entry.id">
+
+            <div class="columns is-align-items-center">
+
+                <div class="column field">
+                    <label class="label">Sambata Start <span x-text="entry.id"></span></label>
+                    <div class="control">
+                        <input class="input" x-model="entry.start" type="time">
+                    </div>
+                </div>
+
+                <div class="column field">
+                    <label class="label">Sambata Stop <span x-text="entry.id"></span></label>
+                    <div class="control">
+                        <input class="input" x-model="entry.stop" type="time">
+                    </div>
+                </div>
+
+                <button
+                    @click.prevent="saturday_entries = [...saturday_entries, { id: saturday_entries.length + 1, start: null, stop: null }]"
+                    class="button is-link is-light mt-4">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path
+                            d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                    </svg>
+
+                </button>
+
+
+                <button @click.prevent="saturday_entries = saturday_entries.filter(elem => {
+                    if (elem.id == 1) {
+                        entry.start = null
+                        entry.stop = null
+                        return true
+                    } else {
+                        return elem.id != entry.id
+                    }
+                });"
+                    class="button is-light mt-4 ml-2 is-danger" 
+                    >
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8" />
+                    </svg>
+
+                </button>
+
+            </div>
+
+        </template>
+
+
+
+        <template x-for="entry in sunday_entries" :key="entry.id">
+
+            <div class="columns is-align-items-center">
+
+                <div class="column field">
+                    <label class="label">Duminica Start <span x-text="entry.id"></span></label>
+                    <div class="control">
+                        <input class="input" x-model="entry.start" type="time">
+                    </div>
+                </div>
+
+                <div class="column field">
+                    <label class="label">Duminica Stop <span x-text="entry.id"></span></label>
+                    <div class="control">
+                        <input class="input" x-model="entry.stop" type="time">
+                    </div>
+                </div>
+
+                <button
+                    @click.prevent="sunday_entries = [...sunday_entries, { id: sunday_entries.length + 1, start: null, stop: null }]"
+                    class="button is-link is-light mt-4">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path
+                            d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                    </svg>
+
+                </button>
+
+
+                <button @click.prevent="sunday_entries = sunday_entries.filter(elem => {
+                    if (elem.id == 1) {
+                        entry.start = null
+                        entry.stop = null
+                        return true
+                    } else {
+                        return elem.id != entry.id
+                    }
+                });"
+                    class="button is-light mt-4 ml-2 is-danger" 
+                    >
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8" />
+                    </svg>
+
+                </button>
+
+            </div>
+
+        </template>
+
+
+        <div class="field mb-4">
+            <label class="label">Alte mentiuni</label>
+            <div class="control">
+                <input class="input" x-model="mentions" type="text"
+                    placeholder="Pauza o ora de la 12PM si nu lucram in zilele libere de la stat.">
+            </div>
+        </div>
+
+
+        <div type="submit" x-bind:class="loading ? 'is-loading' : ''" class="field is-grouped is-grouped-right">
+            <button class="button is-link">
+                Salveaza program de lucru
+            </button>
+        </div>
+
+    </form>
+
+
+    <div x-cloak x-bind:class="error_message != null ? '': 'is-hidden'" class="notification is-danger" style="
+position: fixed;
+bottom: 2rem;
+max-width: 600px;
+left: 1rem;
+">
+        <button x-on:click="error_message = null" class="delete"></button>
+        <p x-text="error_message"></p>
+    </div>
+
+    <div x-cloak x-bind:class="success_message != null ? '': 'is-hidden'" class="notification is-success" style="
+    position: fixed;
+    bottom: 2rem;
+    max-width: 600px;
+    left: 1rem;
+    ">
+        <button x-on:click="success_message = null" class="delete"></button>
+        <p x-text="success_message"></p>
+    </div>
+
+</div>
+
+
+
+
+{%- endmacro %}

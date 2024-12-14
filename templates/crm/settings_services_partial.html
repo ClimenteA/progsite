@@ -1,0 +1,311 @@
+{% macro render(data) -%}
+
+
+<script>
+
+    function services_data() {
+
+        let savedServices = [
+            {
+                id: 1,
+                name: null,
+                description: null,
+                picture: null,
+                base64: null,
+                price: null,
+                capacity: 1,
+                currency: "RON",
+                time_unit: "minutes",
+                time_value: 30,
+                filename: "img.png",
+            }
+        ]
+
+        let savedData = JSON.parse(JSON.stringify({{ data.services | tojson }}))
+
+        if (savedData) {
+            savedServices = savedData
+        }
+
+        return {
+            loading: false,
+            success_message: null,
+            error_message: null,
+            services: savedServices,
+            servicesUrl: document.location.origin + '/crm/static/services',
+            save: async function () {
+
+                this.loading = true
+                this.success_message = null
+                this.error_message = null
+
+                let payload = []
+                for (let i = 0; i < this.services.length; i++) {
+                    const el = this.services[i]
+                    payload.push(
+                        {
+                            id: el.id,
+                            name: el.name,
+                            description: el.description,
+                            picture: el.base64 ? el.base64 : el.picture,
+                            price: el.price,
+                            capacity: el.capacity,
+                            currency: el.currency,
+                            time_unit: el.time_unit,
+                            time_value: el.time_value,
+                        }
+                    )
+                }
+
+                const response = await fetch(this.servicesUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+
+                const result = await response.json()
+
+                this.loading = false
+
+                if (result.status_code == 200) {
+                    this.success_message = result.content
+                    setTimeout(() => { this.success_message = null }, 3000)
+                } else {
+                    this.error_message = result.content
+                    setTimeout(() => { this.error_message = null }, 3000)
+                }
+
+            }
+        }
+    }
+
+</script>
+
+
+<div x-data="services_data">
+
+    <form @submit.prevent="save" x-cloak x-bind:class="activeSection == 'services' ? '': 'is-hidden'"
+        class="box has-background-light mt-6">
+
+        <hgroup class="mb-6">
+            <h1 class="title is-5 is-family-monospace mb-2">Sectiune Servicii</h1>
+            <p class="mb-2">
+                Aici listati toate serviciile pe care afacerea dvs. le ofera.
+                Adaugati o imagine care sa reprezinte cat mai bine serviciul oferit.
+                Completati toate campurile disponibile - inclusiv durata serviciu si pret.
+                Daca pretul si durata serviciului nu sunt fixe specificati acest lucru in campul 'Detalii serviciu'.
+                Incercati sa pastrati un limbaj cat mai simplu si usor de inteles pentru cei care nu lucreaza in domeniul dvs.
+                Dati click pe buttonul "+" sau "-" pentru a adauga sau sterge un serviciu.
+                In campul <strong>Capacitate</strong> introduceti cate servicii puteti executa in paralel. 
+                De exemplu: Daca aveti 2 angajati puteti trece 2 in campul Capacitate - pentru ca puteti executa acele servicii in paralel.
+                Daca lucrati individual puteti lasa valoarea 1.
+            </p>
+            <figure>
+                <img loading="lazy" class="image" src="/public/crm/sections/3services.png" alt="servicii">
+            </figure>
+        </hgroup>
+
+
+        <template x-for="entry in services">
+
+            <div class="mt-6">
+
+                <div class="columns">
+
+                    <div class="column is-two-thirds field">
+                        <label class="label">Nume serviciu <span x-text="entry.id"></span></label>
+                        <div class="control">
+                            <input x-model="entry.name" class="input" type="text" placeholder="Reparatii mecanice"
+                                required>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="columns">
+
+                    <div class="column is-one-third">
+                        <div class="is-flex is-align-items-center">
+
+                            <div class="field">
+                                <label class="label">Durata serviciu</label>
+                                <div class="control">
+                                    <input x-model="entry.time_value" class="input" type="number" min="0" required
+                                        style="max-width: 110px;">
+                                </div>
+                            </div>
+
+                            <div class="field mt-4">
+                                <div class="select">
+                                    <select x-model="entry.time_unit">
+                                        <option value="minutes" selected>Minute</option>
+                                        <option value="hours">Ore</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="column is-one-third">
+                        <div class="is-flex is-align-items-center">
+
+                            <div class="field">
+                                <label class="label">Pret serviciu</label>
+                                <div class="control">
+                                    <input x-model="entry.price" class="input" type="number" min="0"
+                                        style="max-width: 110px;">
+                                </div>
+                            </div>
+
+                            <div class="field ml-2 mt-4">
+                                <div class="select">
+                                    <select x-model="entry.currency">
+                                        <option value="RON">RON</option>
+                                        <option value="EUR">EUR</option>
+                                        <option value="USD">USD</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="column is-one-third">
+                        <div class="is-flex is-align-items-center">
+                            <div class="field">
+                                <label class="label">Capacitate</label>
+                                <div class="control">
+                                    <input x-model="entry.capacity" class="input" type="number" min="0"
+                                        style="max-width: 110px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="field mt-4">
+                    <label class="label">Detalii serviciu</label>
+                    <div class="control">
+                        <textarea x-model="entry.description" class="textarea"
+                            placeholder="Dispunem de echipamente de ultima generatie. Nu exista defectiune pe care sa nu o putem remedia."></textarea>
+                    </div>
+                </div>
+
+                <div class="is-flex is-align-items-center is-justify-content-space-between">
+
+                    <div class="field mt-3">
+
+                        <div class="file has-name">
+                            <label class="file-label">
+                                <input @change="
+                                entry.picture = $event.target.files[0]; 
+                                entry.filename = $event.target.files[0].name;
+                                let reader = new FileReader(); 
+                                reader.onload = () => { entry.base64 = reader.result; }; 
+                                reader.readAsDataURL(entry.picture);
+                            " class="file-input" type="file" accept="image/*">
+                                <span class="file-cta">
+                                    <span class="file-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            fill="currentColor" viewBox="0 0 16 16">
+                                            <path
+                                                d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
+                                            <path
+                                                d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z" />
+                                        </svg>
+                                    </span>
+                                    <span class="file-label">
+                                        Incarca o imagine
+                                    </span>
+                                </span>
+                                <span class="file-name" x-text="entry.filename">
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+
+                    <div class="field buttons">
+
+                        <button @click.prevent="services = [
+                        ...services, 
+                        {   id: services.length + 1, 
+                            name: null, 
+                            description: null, 
+                            picture: null, 
+                            price: null, 
+                            capacity: 1,
+                            currency: 'RON', 
+                            base64: null,
+                            time_unit: 'minutes', 
+                            time_value: null, 
+                            filename: 'img.png' 
+                        }]" class="button is-link is-light">
+
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                                viewBox="0 0 16 16">
+                                <path
+                                    d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                            </svg>
+
+                        </button>
+
+                        <button @click.prevent="services = services.filter(elem => elem.id != entry.id)"
+                            class="button is-light ml-2" x-bind:class="entry.id == 1 ? 'is-secondary': 'is-danger'"
+                            x-bind:disabled="entry.id == 1">
+
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                                viewBox="0 0 16 16">
+                                <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8" />
+                            </svg>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </template>
+
+
+        <div class="field is-grouped is-grouped-right mt-6">
+            <button type="submit" x-bind:class="loading ? 'is-loading' : ''" class="button is-link">
+                Salveaza servicii
+            </button>
+        </div>
+
+
+    </form>
+
+
+    <div x-cloak x-bind:class="error_message != null ? '': 'is-hidden'" class="notification is-danger" style="
+position: fixed;
+bottom: 2rem;
+max-width: 600px;
+left: 1rem;
+">
+        <button x-on:click="error_message = null" class="delete"></button>
+        <p x-text="error_message"></p>
+    </div>
+
+    <div x-cloak x-bind:class="success_message != null ? '': 'is-hidden'" class="notification is-success" style="
+    position: fixed;
+    bottom: 2rem;
+    max-width: 600px;
+    left: 1rem;
+    ">
+        <button x-on:click="success_message = null" class="delete"></button>
+        <p x-text="success_message"></p>
+    </div>
+
+</div>
+
+
+{%- endmacro %}

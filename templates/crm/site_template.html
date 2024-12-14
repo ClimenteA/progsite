@@ -1,0 +1,250 @@
+{% import "crm/site_topnav_partial.html" as topnav %}
+{% import "crm/site_hero_partial.html" as hero %}
+{% import "crm/site_services_partial.html" as services %}
+{% import "crm/site_testimonials_partial.html" as testimonials %}
+{% import "crm/site_about_partial.html" as about %}
+{% import "crm/site_announcement_partial.html" as announcement %}
+{% import "crm/site_contact_partial.html" as contact %}
+{% import "crm/site_make_appointment_partial.html" as make_appointment %}
+{% import "crm/site_availability_partial.html" as availability %}
+{% import "crm/site_footer_partial.html" as footer %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{data.call_to_action.business_name}} - {{data.call_to_action.main_cta}}">
+    <meta name="keywords" content="
+    {%- for s in data.services -%}
+    {{s.name}}, 
+    {%- endfor -%}
+    ">
+    <link rel='icon' type='image/png' href='/public/sfg/assets/favicon.ico'>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/public/bulma.min.css">
+    <link rel="stylesheet" href="/public/common.css">
+    <script defer src="/public/crm/crm.js"></script>
+    <script defer src="/public/alpine.min.js"></script>
+    <title>{{data.call_to_action.business_name}} - {{data.call_to_action.main_cta}}</title>
+</head>
+
+<body>
+
+    <style>
+        .unavailable:hover {
+            background: white;
+            cursor: not-allowed;
+        }
+    </style>
+
+    <script>
+        function handleAppointments() {
+            let isDemo = "{{demo | lower }}" == "true" ? true: false
+            let beavailability = {{ data.availability | tojson }}
+            let empty_availability = isDemo ? null : beavailability
+            return {
+                is_demo: isDemo,
+                loading: false,
+                tenant_id: "{{ data.tenant_id }}",
+                currentIndex: 0,
+                makeAppoitment: false,
+                selectedServiceNameSlug: null,
+                selectedServiceName: null,
+                selectedDay: null,
+                selectedHourInterval: null,
+                fullName: null,
+                phone: null,
+                message: null,
+                modal: null,
+                appointmentMadeInfo: null,
+                availability: empty_availability,
+                setAppoitmentUrl: document.location.origin + '/crm/appointments/set', 
+                availabilityUrl: document.location.origin + '/crm/appointments/{{ data.tenant_id }}',
+                appointmentSuccessMsg: null,
+                appointmentFailedMsg: null,
+                setAppointment: async function(){
+
+                    if (this.is_demo){
+                        console.warn("Demo site")
+                        return
+                    }
+
+                    if (!this.fullName){
+                        this.appointmentFailedMsg = "Campul 'Nume' trebuie completat"
+                        return
+                    }
+
+                    if (!this.phone){
+                        this.appointmentFailedMsg = "Campul 'Telefon' trebuie completat"
+                        return
+                    }
+
+                    if (this.phone){
+                        if (this.phone?.length != 10 || !this.phone.startsWith("07")) {
+                            this.appointmentFailedMsg = "Trebuie un numar de mobil valid. Ex: 0724123123"
+                            return
+                        }
+                    }
+
+                    const payload = {
+                        tenant_id: this.tenant_id,
+                        full_name: this.fullName,
+                        day: this.selectedDay,
+                        hour_interval: this.selectedHourInterval,
+                        selected_service_slug: this.selectedServiceNameSlug,
+                        phone: this.phone,
+                        message: this.message,
+                    }
+
+                    const response = await fetch(this.setAppoitmentUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    })
+
+                    const result = await response.json()
+
+                    if (result.status_code == 200) {
+                        this.appointmentSuccessMsg = result.content
+                        this.appointmentMadeInfo = `Serviciul: ${this.selectedServiceName} - ${this.selectedDay}. Orele: ${this.selectedHourInterval}`
+                        navigator.clipboard.writeText(`Programare facuta pe website: ${document.location.href} pentru ` + this.appointmentMadeInfo)
+                        
+                        {% if not user %}
+                        localStorage.setItem("programare-{{ data.tenant_id }}", result.extra)
+                        {% endif %}
+                        
+                        this.selectedDay = null
+                        this.selectedHourInterval = null
+                        this.appointmentSuccessMsg = null
+                        this.appointmentFailedMsg = null
+                        this.makeAppoitment = false
+                        this.selectedServiceNameSlug = null
+                        this.selectedServiceName = null
+                        window.scrollTo(0, 0)
+                    } else if (result.status_code == 400) {
+                        this.appointmentFailedMsg = result.content
+                    } else {
+                        this.appointmentFailedMsg = result.content
+                    }
+                    
+                },
+                selectInterval: async function(entry, selectedDay){
+
+                    if (this.is_demo){
+                        console.warn("Demo site")
+                        return
+                    }
+
+                    if (!entry.available) {
+                        return
+                    }
+                    this.fullName = null
+                    this.phone = null
+                    this.message = null
+                    this.selectedDay = selectedDay
+                    this.selectedHourInterval = entry.hour_interval
+                },
+                showAvailability: async function() {
+
+                    if (this.is_demo){
+                        this.makeAppoitment = true
+                        this.selectedServiceName = null
+                        this.selectedServiceNameSlug = null
+                        console.warn("Demo site")
+                        return
+                    }
+
+                    this.loading = true
+
+                    const response = await fetch(this.availabilityUrl + "/" + this.selectedServiceNameSlug, {
+                        headers: {'Content-Type': 'application/json'}
+                    })
+
+                    const result = await response.json()
+
+                    this.loading = false
+
+                    if (result.status_code == 200) {
+                        this.availability = result.extra
+                    } 
+                }
+            }
+        }
+    </script>
+
+
+    <div x-data="handleAppointments">
+        
+        {{ announcement.render(data) }}
+
+        {{ topnav.render(data) }}
+
+        <div x-cloak x-show="!makeAppoitment && !selectedServiceName">
+
+            {{ hero.render(data) }}
+
+            {{ services.render(data) }}
+
+            {{ about.render(data) }}
+
+            {{ testimonials.render(data) }}
+
+            {{ contact.render(data) }}
+
+        </div>
+
+        {% if demo %}
+
+        <div x-cloak x-show="makeAppoitment && !selectedServiceName" class="section container mt-6" style="min-height: 70vh;">
+
+            <hgroup class="has-text-centered">
+                <h1 class="title">🤖 Acesta este un website demo</h1>
+                <h2 class="subtitle">Creaza un cont pentru a testa programarile online (nu costa nimic sa testezi 😉)</h2>  
+            </hgroup>
+            
+            <div class="is-flex is-justify-content-center">
+                <a class="mt-6 button is-primary is-large" href="/crm/users/register">👉 Creeaza un cont aici 👈</a>
+            </div>
+
+        </div>
+
+        {% else %}
+
+        <div x-cloak x-show="makeAppoitment && !selectedServiceName" class="container">
+            {{ make_appointment.render(data) }}
+        </div>
+
+        <section x-cloak x-show="selectedServiceName" class="container" style="min-height: 70vh;">
+            {{ availability.render(data) }}
+        </section>
+
+
+        <div x-cloak x-bind:class="appointmentMadeInfo != null ? '': 'is-hidden'" class="notification is-info" style="
+        position: fixed;
+        bottom: 2rem;
+        max-width: 600px;
+        right: 1rem;
+        z-index: 1;
+        ">
+            <button x-on:click="appointmentMadeInfo = null" class="delete"></button>
+            <h4 class="title is-5">Programarea a fost facuta!</h4> 
+            <p x-text="appointmentMadeInfo"></p>
+        </div>
+
+        {% endif %}
+        
+        {{ footer.render(data) }}
+
+    </div>
+
+</body>
+
+</html>

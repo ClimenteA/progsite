@@ -1,0 +1,58 @@
+{% macro render(data) -%}
+
+
+<div class="content">
+    <h2>Politica de Confidențialitate (GDPR) pentru {{ data.business_name }}</h2>
+
+    <p>
+        Această Politică de Confidențialitate explică ce date personale colectăm și cum le folosim. Ar trebui să citești
+        această politică pentru a înțelege ce date colectăm, cum le folosim, cum le protejăm și drepturile tale ca
+        utilizator. Pentru mai multe informații despre cum folosim, stocăm și păstrăm datele tale personale în
+        siguranță, vezi Politica noastră de Cookie-uri.
+    </p>
+
+    <h4>Ce date personale colectăm?</h4>
+
+    <p>
+        Colectăm doar numele și numărul de telefon al utilizatorului. Aceste date sunt colectate prin formularul de
+        programări online.
+    </p>
+
+    <h4>Cum folosim datele colectate?</h4>
+
+    <p>
+        Scopul colectării datelor este de a intra în contact cu utilizatorul pentru onorarea programării online.
+        Datele sunt automat sterse de server dupa ce programarea a expirat.
+    </p>
+
+    <h4>Cu cine partajăm datele colectate?</h4>
+
+    <p>
+        Datele pot fi văzute doar de personalul autorizat.
+    </p>
+
+    <h4>Cum păstrăm datele în siguranță?</h4>
+
+    <p>
+        Folosim cele mai bune practici de securizare a serverului și tehnologia SSL/TLS pentru a asigura protecția
+        datelor în tranzit.
+    </p>
+
+    <h4>Drepturile tale</h4>
+
+    <p>
+        Utilizatorul poate oricând solicita stergerea sau actualizarea datelor.
+        Datele nu sunt folosite decat in comunicarea directa cu dvs. si nu sunt vandute catre alte terti.
+    </p>
+
+    <h4>Contact</h4>
+
+    <p>
+        Dacă ai întrebări sau nelămuriri legate de această politică de confidențialitate, te rugăm să ne contactezi la
+        {{ data.email }}.
+    </p>
+
+</div>
+
+
+{%- endmacro %}

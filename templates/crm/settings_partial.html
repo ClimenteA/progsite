@@ -1,0 +1,129 @@
+{% import "crm/settings_announcements_partial.html" as announcements_form %}
+{% import "crm/settings_hero_partial.html" as hero_form %}
+{% import "crm/settings_services_partial.html" as services_form %}
+{% import "crm/settings_about_partial.html" as about_form %}
+{% import "crm/settings_reviews_partial.html" as reviews_form %}
+{% import "crm/settings_contact_partial.html" as contact_form %}
+{% import "crm/settings_schedule_partial.html" as schedule_form %}
+{% import "crm/settings_links_partial.html" as links_form %}
+
+{% macro render(data) -%}
+
+
+<style>
+    form {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    img {
+        max-height: 400px;
+        width: auto;
+        object-fit: contain;
+        margin: 0 auto;
+    }
+
+</style>
+
+
+<main x-data="{activeSection: 'announcements'}" class="container main-y-margin px-1">
+
+    <hgroup>
+        <h1 class="title is-3">Setari</h1>
+        <h2 class="subtitle has-text-grey is-size-6 mt-2">
+            Click pe o sectiune pe care vrei sa o actualizezi.
+            Aceste schimbari vor fi aplicate direct in websitul de prezentare.
+            Poti da click pe 'Vezi website live' pentru a vedea schimbarile.
+        </h2>
+    </hgroup>
+
+
+    <div id="section-tabs" class="tabs is-centered mt-6 py-4 px-4 custom-scroll-container">
+        <ul>
+            <li x-bind:class="activeSection == 'announcements' ? 'is-active': ''">
+                <a x-on:click="activeSection = 'announcements'">
+                    Informari
+                </a>
+            </li>
+            <li x-bind:class="activeSection == 'hero' ? 'is-active': ''">
+                <a x-on:click="activeSection = 'hero'">
+                    Call to action
+                </a>
+            </li>
+            <li x-bind:class="activeSection == 'services' ? 'is-active': ''">
+                <a x-on:click="activeSection = 'services'">
+                    Servicii
+                </a>
+            </li>
+            <li x-bind:class="activeSection == 'about' ? 'is-active': ''">
+                <a x-on:click="activeSection = 'about'">
+                    Despre noi
+                </a>
+            </li>
+            <li x-bind:class="activeSection == 'reviews' ? 'is-active': ''">
+                <a x-on:click="activeSection = 'reviews'">
+                    Testimoniale
+                </a>
+            </li>
+            <li x-bind:class="activeSection == 'contact' ? 'is-active': ''">
+                <a x-on:click="activeSection = 'contact'">
+                    Contact
+                </a>
+            </li>
+            <li x-bind:class="activeSection == 'schedule' ? 'is-active': ''">
+                <a x-on:click="activeSection = 'schedule'">
+                    Program de Lucru
+                </a>
+            </li>
+            <li x-ref="links" x-bind:class="activeSection == 'links' ? 'is-active': ''">
+                <a x-on:click="activeSection = 'links'">
+                    Linkuri Externe
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    {{ announcements_form.render(data) }}
+
+    {{ hero_form.render(data) }}
+
+    {{ services_form.render(data) }}
+
+    {{ about_form.render(data) }}
+
+    {{ reviews_form.render(data) }}
+
+    {{ contact_form.render(data) }}
+
+    {{ schedule_form.render(data) }}
+
+    {{ links_form.render(data) }}
+
+
+</main>
+
+
+
+<script>
+
+    const scrollContainer = document.getElementById("section-tabs");
+
+    scrollContainer.addEventListener("wheel", (evt) => {
+        evt.preventDefault();
+
+        if (evt.deltaY < 0) {
+            scrollContainer.scrollLeft += evt.deltaY - 100;
+        } else {
+            scrollContainer.scrollLeft += evt.deltaY + 100;
+        }
+
+    });
+
+</script>
+
+
+
+
+
+
+{%- endmacro %}

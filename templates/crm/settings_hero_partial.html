@@ -1,0 +1,199 @@
+{% macro render(data) -%}
+
+<script>
+
+    function hero() {
+        return {
+            loading: false,
+            business_name: "{{ data.call_to_action.business_name }}",
+            business_type: "{{ data.call_to_action.business_type }}",
+            main_cta: "{{ data.call_to_action.main_cta }}",
+            secondary_cta: "{{ data.call_to_action.secondary_cta }}",
+            picture_cta: "{{ data.call_to_action.picture_cta }}",
+            base64: null,
+            success_message: null,
+            error_message: null,
+            filename: "img.png",
+            ctaUrl: document.location.origin + '/crm/static/cta',
+            save: async function () {
+
+                if (this.picture_cta == "None") {
+                    this.picture_cta = null
+                }
+
+                this.loading = true
+                this.success_message = null
+                this.error_message = null
+
+                const payload = {
+                    business_name: this.business_name,
+                    business_type: this.business_type,
+                    main_cta: this.main_cta,
+                    secondary_cta: this.secondary_cta,
+                    picture_cta: this.base64 ? this.base64 : this.picture_cta,
+                }
+
+                const response = await fetch(this.ctaUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+
+                const result = await response.json()
+
+                this.loading = false
+
+                if (result.status_code == 200) {
+                    this.success_message = result.content
+                    setTimeout(() => { this.success_message = null }, 3000)
+                } else {
+                    this.error_message = result.content
+                    setTimeout(() => { this.error_message = null }, 3000)
+                }
+
+            }
+        }
+    }
+
+</script>
+
+
+<div x-data="hero">
+
+
+    <form @submit.prevent="save" x-cloak x-bind:class="activeSection == 'hero' ? '': 'is-hidden'"
+        class="box has-background-light mt-6">
+
+        <hgroup class="mb-6">
+            <h1 class="title is-5 is-family-monospace mb-2">Sectiune Principala (CTA)</h1>
+            <p class="mb-2">
+                In aceasta sectiune utilizatorul trebuie sa afle ce servicii ofera afacerea dvs. si
+                de ce sa va aleaga pe dvs. in schimbul competitorilor.
+                Adaugati o imagine care sa descrie cat mai bine serviciile oferite.
+            </p>
+            <figure>
+                <img loading="lazy" class="image" src="/public/crm/sections/2hero.png" alt="hero image">
+            </figure>
+        </hgroup>
+
+        <div class="columns">
+
+            <div class="field column">
+                <label class="label">Numele afacerii</label>
+                <div class="control">
+                    <input x-model="business_name" class="input" type="text" placeholder="Ex: BestAuto" required>
+                </div>
+            </div>
+
+            <div class="field column">
+
+                <label class="label">Tipul afacerii</label>
+                <div class="control">
+                    <input x-model="business_type" class="input" type="text" placeholder="Ex: SERVICE AUTO"
+                        list="bizz-types" required>
+                </div>
+
+                <datalist id="bizz-types">
+                    <option value="SERVICE AUTO">
+                    <option value="CABINET DENTAR">
+                    <option value="CABINET VETERINAR">
+                    <option value="SALON BEAUTY">
+                    <option value="BARBER SHOP">
+                    <option value="TATUAJE">
+                    <option value="CABINET PSIHOLOGIC">
+                    <option value="OPTICA MEDICALA">
+                    <option value="RECUPERARE MEDICALA">
+                </datalist>
+
+            </div>
+
+
+        </div>
+
+
+        <div class="field">
+            <label class="label">Sloganul/Mottoul</label>
+            <div class="control">
+                <input x-model="main_cta" class="input" type="text" placeholder="Ex: Reparam autovehicule de cat.B">
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Detalii slogan/motto</label>
+            <div class="control">
+                <textarea class="textarea" x-model="secondary_cta"
+                    placeholder="Mai multe detalii. Ex: Avem cei mai buni mecanici din Iasi :)"></textarea>
+            </div>
+        </div>
+
+
+        <div class="field">
+
+            <div class="file has-name">
+                <label class="file-label">
+                    <input @change="
+                    picture_cta = $event.target.files[0]; 
+                    filename = $event.target.files[0].name; 
+                    let reader = new FileReader(); 
+                    reader.onload = () => { base64 = reader.result; }; 
+                    reader.readAsDataURL(picture_cta);
+                " class="file-input" type="file" accept="image/*">
+                    <span class="file-cta">
+                        <span class="file-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                viewBox="0 0 16 16">
+                                <path
+                                    d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
+                                <path
+                                    d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z" />
+                            </svg>
+                        </span>
+                        <span class="file-label">
+                            Incarca o imagine
+                        </span>
+                    </span>
+                    <span class="file-name" x-text="filename">
+                    </span>
+                </label>
+            </div>
+
+        </div>
+
+
+        <div class="field is-grouped is-grouped-right">
+            <button type="submit" x-bind:class="loading ? 'is-loading' : ''" class="button is-link">
+                Salveaza
+            </button>
+        </div>
+
+    </form>
+
+
+
+    <div x-cloak x-bind:class="error_message != null ? '': 'is-hidden'" class="notification is-danger" style="
+position: fixed;
+bottom: 2rem;
+max-width: 600px;
+left: 1rem;
+">
+        <button x-on:click="error_message = null" class="delete"></button>
+        <p x-text="error_message"></p>
+    </div>
+
+    <div x-cloak x-bind:class="success_message != null ? '': 'is-hidden'" class="notification is-success" style="
+    position: fixed;
+    bottom: 2rem;
+    max-width: 600px;
+    left: 1rem;
+    ">
+        <button x-on:click="success_message = null" class="delete"></button>
+        <p x-text="success_message"></p>
+    </div>
+
+
+</div>
+
+
+{%- endmacro %}

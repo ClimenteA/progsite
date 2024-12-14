@@ -1,0 +1,175 @@
+{% macro render(data) -%}
+
+<script>
+
+    function links() {
+
+        let externalLinks = [
+            {
+                id: 1,
+                name: null,
+                link: null,
+            }
+        ]
+
+        let savedLinks = {{ data.external_links | tojson }}
+        if (savedLinks) {
+            externalLinks = savedLinks
+        }
+
+        return {
+            loading: false,
+            success_message: null,
+            error_message: null,
+            extlinkUrl: document.location.origin + '/crm/static/external-links',
+            external_links: externalLinks,
+            save: async function () {
+
+                this.loading = true
+                this.success_message = null
+                this.error_message = null
+
+                const payload = this.external_links
+
+                const response = await fetch(this.extlinkUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+
+                const result = await response.json()
+
+                this.loading = false
+
+                if (result.status_code == 200) {
+                    this.success_message = result.content
+                    setTimeout(() => { this.success_message = null }, 3000)
+                } else {
+                    this.error_message = result.content
+                    setTimeout(() => { this.error_message = null }, 3000)
+                }
+
+            }
+        }
+    }
+
+</script>
+
+
+<div x-data="links">
+
+
+    <form @submit.prevent="save" x-cloak x-bind:class="activeSection == 'links' ? '': 'is-hidden'"
+        class="box has-background-light mt-6">
+
+        <hgroup class="mb-6">
+            <h1 class="title is-5 is-family-monospace mb-2">Sectiune Linkuri Externe</h1>
+            <p class="mb-2">
+                Adaugati link-uri externe care vor aparea in ultima sectiune a websitului (footer).
+                Puteti adauga diverse link-uri catre retele sociale (Instragram, Facebook, etc),
+                link-uri catre articole de blog sau orice alt link care considerati ca ar ajuta clientii sa va cunoasca mai bine.
+            </p>
+            <figure>
+                <img loading="lazy" class="image" src="/public/crm/sections/9footerlinks.png" alt="external links">
+            </figure>
+        </hgroup>
+
+
+        <template x-for="entry in external_links" :key="entry.id">
+
+            <div class="mt-2">
+
+                <div class="columns is-align-items-center">
+
+                    <div class="column field">
+                        <label class="label">Nume link <span x-text="entry.id"></span></label>
+                        <div class="control">
+                            <input x-model="entry.name" class="input" type="text"
+                                placeholder="Ex: Reparatii alternatoare"></input>
+                        </div>
+                    </div>
+
+                    <div class="column field">
+                        <label class="label">Link</label>
+                        <div class="control">
+                            <input x-model="entry.link" class="input" type="text"
+                                placeholder="Ex: https://www.youtube.com/watch?v=LGB6ZEjGm7Q&list=RDQMajeSP3P2mGo&start_radio=1"></input>
+                        </div>
+                    </div>
+
+                    <div class="column is-one-fifth field">
+
+                        <div class="buttons mt-4">
+
+                            <button @click.prevent="external_links = [
+    ...external_links, 
+    {   id: external_links.length + 1, 
+        name: null,
+        link: null,
+    }]" class="button is-link is-light">
+
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                                    viewBox="0 0 16 16">
+                                    <path
+                                        d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                                </svg>
+
+                            </button>
+
+                            <button @click.prevent="external_links = external_links.filter(elem => elem.id != entry.id)"
+                                class="button is-light ml-2" x-bind:class="entry.id == 1 ? 'is-secondary': 'is-danger'"
+                                x-bind:disabled="entry.id == 1">
+
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                                    viewBox="0 0 16 16">
+                                    <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8" />
+                                </svg>
+
+                            </button>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </template>
+
+
+        <div class="field is-grouped is-grouped-right mt-6">
+            <button type="submit" x-bind:class="loading ? 'is-loading' : ''" class="button is-link">
+                Salveaza linkuri externe
+            </button>
+        </div>
+
+    </form>
+
+
+    <div x-cloak x-bind:class="error_message != null ? '': 'is-hidden'" class="notification is-danger" style="
+position: fixed;
+bottom: 2rem;
+max-width: 600px;
+left: 1rem;
+">
+        <button x-on:click="error_message = null" class="delete"></button>
+        <p x-text="error_message"></p>
+    </div>
+
+    <div x-cloak x-bind:class="success_message != null ? '': 'is-hidden'" class="notification is-success" style="
+    position: fixed;
+    bottom: 2rem;
+    max-width: 600px;
+    left: 1rem;
+    ">
+        <button x-on:click="success_message = null" class="delete"></button>
+        <p x-text="success_message"></p>
+    </div>
+
+</div>
+
+
+
+{%- endmacro %}

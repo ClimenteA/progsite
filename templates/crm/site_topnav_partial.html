@@ -1,0 +1,58 @@
+{% import "crm/site_svglogo_partial.html" as svglogo %}
+
+
+{% macro render(data) -%}
+
+
+<nav x-data="{showBurgerMenu: false}" class="navbar is-white is-unselectable" role="navigation" aria-label="main navigation">
+
+    <div class="container">
+
+        <div class="navbar-brand">
+
+            <a class="navbar-item" x-on:click="showBurgerMenu = false; makeAppoitment = false; selectedServiceName = null; selectedServiceNameSlug = null;">
+
+                {{ svglogo.render(data) }}
+
+                <strong style="font-size: large; margin-left:5px;">{{data.call_to_action.business_name}}</strong>
+            </a>
+
+            <a x-on:click="showBurgerMenu = !showBurgerMenu" x-bind:class="showBurgerMenu ? 'is-active': ''"
+                role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
+                data-target="navbarBasicExample">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div x-bind:class="showBurgerMenu ? 'is-active': ''" class="navbar-menu">
+
+            <div class="navbar-end">
+
+                <a @click="showBurgerMenu = false" href="#about" class="navbar-item" x-bind:class="makeAppoitment ? 'is-hidden': ''">
+                    Despre noi
+                </a>
+
+                <a @click="showBurgerMenu = false" href="#services" class="navbar-item" x-bind:class="makeAppoitment ? 'is-hidden': ''">
+                    Servicii
+                </a>
+
+                <div class="navbar-item">
+                    <a href="/crm/users/login" class="button is-light">
+                        Intra in cont
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+<div class="container" style="border-bottom: 1px solid lightgray;"></div>
+
+
+{%- endmacro %}

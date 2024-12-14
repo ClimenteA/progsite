@@ -1,0 +1,132 @@
+{% macro render(data) -%}
+
+
+<script>
+
+    function announcements() {
+
+    let announcementMsg = {% if data.announcement %} "{{data.announcement.message}}" {% else %} null {% endif %}
+    let announcementExp = {% if data.announcement %} "{{data.announcement.expire}}" {% else %} null {% endif %}
+
+    return {
+        loading: false,
+        announcement: announcementMsg,
+        expire: announcementExp,
+        error_message: null,
+        success_message: null,
+        fillFieldsMsg: "Ambele campuri trebuie completate",
+        announcements_url: document.location.origin + '/crm/static/annoucement',
+        save: async function () {
+
+            if (this.announcement) {
+                if (!this.expire) {
+                    this.error_message = "Ambele campuri trebuie completate"
+                    setTimeout(() => { this.error_message = null }, 5000)
+                }
+            }
+
+
+            this.loading = true
+            this.error_message = null
+
+            const payload = {
+                message: this.announcement,
+                expire: this.expire,
+            }
+
+            const response = await fetch(this.announcements_url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+
+
+            const result = await response.json()
+
+            this.loading = false
+
+            if (result.status_code == 200) {
+                this.success_message = result.content
+                setTimeout(() => { this.success_message = null }, 3000)
+            } else {
+                this.error_message = result.content
+                setTimeout(() => { this.error_message = null }, 3000)
+            }
+        }
+    }
+    }
+
+</script>
+
+<div x-data="announcements">
+
+    <form @submit.prevent="save" x-cloak x-bind:class="activeSection == 'announcements' ? '': 'is-hidden'"
+        class="box has-background-light mt-6">
+
+        <hgroup>
+            <h1 class="title is-5 is-family-monospace mb-2">Sectiune Informari</h1>
+            <p class="mb-2">
+                Aici poti adauga diverse informari/anunturi sau promotii care apar in prima parte a websitului
+                deasupra meniului.
+            </p>
+            <figure>
+                <img loading="lazy" class="image" src="/public/crm/sections/1anunturi.png" alt="comunicare">
+            </figure>
+        </hgroup>
+
+        <div class="columns mt-4">
+
+            <div class="field column">
+                <label class="label">Informare/Comunicare/Promotie</label>
+                <div class="control">
+                    <input x-model="announcement" class="input" type="text" placeholder="Ex: Revenim pe 3 ianuarie!">
+                </div>
+            </div>
+
+            <div class="field column">
+                <label class="label">Expira la (Luna/Zi/An)</label>
+                <div class="control">
+                    <input x-model="expire" class="input" type="datetime-local">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="field is-grouped is-grouped-right">
+            <button type="submit" x-bind:class="loading ? 'is-loading' : ''" class="button is-link">
+                Salveaza informare
+            </button>
+        </div>
+
+    </form>
+
+
+
+    <div x-cloak x-bind:class="error_message != null ? '': 'is-hidden'" class="notification is-danger" style="
+position: fixed;
+bottom: 2rem;
+max-width: 600px;
+left: 1rem;
+">
+        <button x-on:click="error_message = null" class="delete"></button>
+        <p x-text="error_message"></p>
+    </div>
+
+    <div x-cloak x-bind:class="success_message != null ? '': 'is-hidden'" class="notification is-success" style="
+    position: fixed;
+    bottom: 2rem;
+    max-width: 600px;
+    left: 1rem;
+    ">
+        <button x-on:click="success_message = null" class="delete"></button>
+        <p x-text="success_message"></p>
+    </div>
+
+
+</div>
+
+
+
+{%- endmacro %}

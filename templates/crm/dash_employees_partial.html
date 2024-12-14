@@ -1,0 +1,263 @@
+{% macro render(data, invited_users) -%}
+
+
+<script>
+
+    function employeesAdmin(){
+        return {
+            tenant_id: "{{data.tenant_id}}",
+            activeSection: "invited-employees",
+            successMsg: null,
+            failedMsg: null,
+            baseInviteLink: document.location.origin + "/crm/users/register?invite_token=",
+            inviteLink: null,
+            email: null,
+            role: "normal",
+            inviteUserUrl: document.location.origin + "/crm/users/invite",
+            addUser: async function(){
+
+                const payload = {
+                    tenant_id: this.tenant_id,
+                    email: this.email,
+                    role: this.role,
+                }
+
+                const response = await fetch(this.inviteUserUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+
+                const result = await response.json()
+
+                if (result.status_code == 200) {
+                    this.successMsg = result.content
+                    if (result.extra) {
+                        this.email = null
+                        this.inviteLink = this.baseInviteLink + result.extra
+                        navigator.clipboard.writeText(this.inviteLink)
+                    }
+                } else {
+                    this.failedMsg = result.content
+                }
+
+            }
+        }
+    }
+
+</script>
+
+
+<main x-data="employeesAdmin" class="container main-y-margin px-1">
+
+    <hgroup class="mb-6">
+        <h1 class="title is-3">Angajati</h1>
+        <h2 class="subtitle has-text-grey is-size-6 mt-2">
+            Aici poti adauga si alti utilizatori (angajati) in aplicatie care pot interactiona cu aceste pagini de admin (Programari, Angajati, Setari).
+            Poti alege sa limitezi accesul angajatiilor in aceste pagini de admin astfel 
+            incat utilizatorul invitat poate avea access doar la pagina Programari de exemplu (recomandat).
+            <br>
+            In tabul <strong>Invita Angajati</strong> poti adauga emailul utilizatorului (angajatului) care vrei sa aiba access la aplicatie si vei primi un link de invitatie. 
+            Linkul de invitatie va fi valabil pentru 30 de zile si va fi invalid odata ce este folosit. 
+            Trimite linkul de invitatie persoanei prin email, sms, aplicatie chat sau orice alta metoda de comunicare folosesti.
+        </h2>
+    </hgroup>
+
+
+    <div class="tabs is-centered mt-6 py-4 px-4 custom-scroll-container">
+        <ul>
+            <li x-bind:class="activeSection == 'invited-employees' ? 'is-active': ''">
+                <a x-on:click="activeSection = 'invited-employees'">
+                    Angajati invitati
+                </a>
+            </li>
+            <li x-bind:class="activeSection == 'invite-employees' ? 'is-active': ''">
+                <a x-on:click="activeSection = 'invite-employees'">
+                    Invita Angajati 
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    
+    <div class="px-1" style="max-width: 900px; margin: 0 auto;">
+        
+        <section id="invited-employees" x-cloak x-bind:class="activeSection == 'invited-employees' ? '': 'is-hidden'">
+            
+            {% if invited_users %}
+
+            <script>
+
+                function empHandler(uid, userActiveStatus){
+
+                    return () => {
+                        return {
+                            currentUserId: uid,
+                            active: userActiveStatus, 
+                            userDeleted: false,
+                            toggleActiveStatusUrl: document.location.origin + "/crm/users/toggle-active-status",
+                            deleteUserUrl: document.location.origin + "/crm/users/delete-invited-user",
+                            setAsInactiv: async function(){
+
+                                let currentActive = !this.active
+
+                                const response = await fetch(this.toggleActiveStatusUrl + `/${this.currentUserId}/${currentActive}`, {
+                                    method: "PUT",
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                })
+
+                                const result = await response.json()
+
+                                if (result.status_code == 200) {
+                                    this.active = currentActive
+                                } 
+                            },
+                            deleteUser: async function(){
+
+                                if (this.userDeleted) {
+                                    return
+                                }
+
+                                const response = await fetch(this.deleteUserUrl + `/${this.currentUserId}`, {
+                                    method: "DELETE",
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                })
+
+                                const result = await response.json()
+
+                                if (result.status_code == 200) {
+                                    this.active = false
+                                    this.userDeleted = true
+                                } 
+
+                            },
+                        }
+                    } 
+                }
+
+            </script>
+
+            {% for emp in invited_users %}
+
+            <article
+            x-data="empHandler('{{emp.user_id}}', {{ emp.active | lower }})"
+            class="card has-background-light mb-6">
+                <header class="card-header">
+                    <p class="card-header-title">
+                        <span class="mr-2">{{ emp.username }}</span>       
+                    </p>
+                </header>
+                <div class="card-content">
+                    <div class="content">
+                        <p>
+                            Email: <strong>{{ emp.email }} </strong> 
+                            <br>
+                            Telefon: <strong>{{ emp.phone }}</strong>
+                        </p>
+
+                        <span>Status:</span>
+                        <strong x-cloak x-show="active" class="has-text-success">Activ</strong>
+                        <strong x-cloak x-show="!active" class="has-text-warning-dark">Inactiv</strong>
+
+                        <span class="ml-2">Rol:</span>
+                        <strong>{{ emp.role }}</strong> 
+
+                        {% if emp.password == 'TEMPORARY INVITED USER' %}
+                        <p x-cloak x-show="!userDeleted" class="has-text-danger mt-2">Acest utilizator inca nu si-a creat contul.</p>
+                        {% endif %}
+
+                        <p x-cloak x-show="userDeleted" class="has-text-danger mt-2">Utilizatorul a fost sters!</p>
+
+                        <small class="has-text-grey is-pulled-right" style="font-size: 12px !important;">Id: {{emp.user_id}}</small> 
+                        
+                    </div>
+                </div>
+                <footer class="card-footer is-unselectable">
+                    {% if emp.password == 'TEMPORARY INVITED USER' %}
+                        <a class="card-footer-item has-text-grey-dark has-text-weight-bold">
+                            Inactiv
+                        </a>
+                    {% else %}
+                        <a x-on:click="setAsInactiv" class="card-footer-item has-text-warning-dark has-text-weight-bold">
+                            Inactiv
+                        </a>
+                    {% endif %}
+                    <a x-on:click="deleteUser" x-bind:class="userDeleted ? 'has-text-grey-dark': 'has-text-danger'" class="card-footer-item has-text-weight-bold">
+                        Sterge
+                    </a>
+                </footer>
+            </article>
+            
+            {% endfor %}
+        
+            {% else %}
+            <p class="has-text-centered">Tu esti singurul angajat momentan</p>
+            {% endif %}
+        
+        </section>
+
+
+        <section id="invite-employees" x-cloak x-bind:class="activeSection == 'invite-employees' ? '': 'is-hidden'">
+
+            <form class="small-form box p-6 is-flex is-flex-direction-column is-justify-content-center has-background-light"
+                @submit.prevent="addUser">
+
+                <div class="field">
+                    <label class="label">Email</label>
+                    <div class="control">
+                        <input x-model="email" class="input is-large is-responsive" type="email" placeholder="alinpopescu@gmail.com"
+                            required>
+                    </div>
+                </div>
+        
+                <div class="control is-flex is-flex-direction-column mt-4">
+        
+                    <label class="radio ml-2 mb-4">
+                        <input type="radio" value="normal" x-model="role" x-bind:checked="role">
+                        Normal
+                        <p class="help has-text-grey">Are access total la pagina programari</p>
+                    </label>
+
+                    <label class="radio mb-4">
+                        <input type="radio" value="admin" x-model="role">
+                        Admin
+                        <p class="help has-text-grey">Are access total la toate paginile</p>
+                    </label>
+        
+                </div>
+        
+                <button type="submit" class="button is-link is-large is-responsive mt-6">
+                    Link pentru acces <strong class="mx-1" x-text="role"></strong>
+                </button>
+                <p class="help has-text-grey is-pulled-right">Linkul va fi copiat automat in clipboard</p>
+        
+            </form>
+
+
+            <div x-bind:class="failedMsg ? '': 'is-hidden'" class="notification is-danger">
+                <button x-on:click="failedMsg = null;" class="delete"></button>
+                <p x-text="failedMsg"></p>
+            </div>
+
+            <div x-bind:class="successMsg ? '': 'is-hidden'" class="notification is-success">
+                <button x-on:click="successMsg = null;" class="delete"></button>
+                <p x-text="successMsg"></p>
+            </div>
+
+            <p class="has-text-weight-bold" x-text="inviteLink"></p>
+        
+        </section>
+
+    </div>
+
+</main>
+
+<div style="margin-top: 16rem;"></div>
+
+{%- endmacro %}

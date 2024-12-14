@@ -1,0 +1,102 @@
+{% extends "crm/base.html" %}
+
+
+{% block content %}
+
+
+<script>
+
+    function login() {
+        return {
+            loading: false,
+            phone_or_email: null,
+            password: null,
+            error_message: null,
+            login_url: document.location.origin + "/crm/users/login",
+            save: async function () {
+
+                this.loading = true
+                this.error_message = null
+
+                const payload = {
+                    phone_or_email: this.phone_or_email,
+                    password: this.password,
+                }
+
+                const response = await fetch(this.login_url, {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+
+                const result = await response.json()
+
+                this.loading = false
+
+                if (result.status_code == 200) {
+                    document.location = "/crm/dashboard"
+                } else {
+                    this.error_message = result.content
+                }
+
+            }
+        }
+    }
+
+
+</script>
+
+<main x-data="login">
+
+    <div class="is-flex is-justify-content-center">
+
+        <form @submit.prevent="save" class="box has-background-light mt-6">
+
+            <h1 class="title is-4 has-text-grey mb-6">Intra in cont</h1>
+
+            <div class="field">
+                <label class="label">Telefon sau Email</label>
+                <div class="control">
+                    <input x-model="phone_or_email" class="input" type="text">
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label">Parola</label>
+                <div class="control">
+                    <input x-model="password" class="input" type="password">
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a style="font-size: 12px; margin-right: 1rem;" href="/crm/users/register">Nu am cont</a>
+                <a style="font-size: 12px;" href="/crm/contact">Am uitat parola</a>
+            </div>
+
+            <div class="buttons is-grouped is-pulled-right mt-6">
+                <button x-bind:class="loading ? 'is-loading': ''" type="submit" class="button is-link">
+                    Intra in cont
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <div x-cloak x-bind:class="error_message != null ? '': 'is-hidden'" class="notification is-danger" style="
+        position: absolute;
+        bottom: 2rem;
+        max-width: 600px;
+        right: 1rem;
+    ">
+        <button x-on:click="error_message = null" class="delete"></button>
+        <p x-text="error_message"></p>
+    </div>
+
+</main>
+
+
+{% endblock content %}

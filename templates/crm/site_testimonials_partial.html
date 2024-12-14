@@ -1,0 +1,52 @@
+{% macro render(data) -%}
+
+
+{% if data.testimonials %}
+
+<section class="container">
+
+    <h2 class="subtitle has-text-grey-dark mt-6 px-1">
+        Ce spun clientii nostri:
+    </h2>
+
+
+    <div id="testimonials" class="columns is-mobile is-vcentered inner-shadow overflow-hidden is-unselectable px-4">
+
+        {% for t in data.testimonials %}
+
+        <div class="column" style="min-width: 420px;">
+
+            <div class="card has-background-primary">
+                <div class="card-content">
+                    <p class="title has-text-light">
+                        “{{ t.testimonial }}”
+                    </p>
+
+                    <p class="subtitle">
+                        {{ t.person_name }} - {{ t.occupation }}
+                    </p>
+
+                </div>
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+
+{% endif %}
+
+
+
+<div class="is-flex is-align-items-center is-justify-content-center" style="margin-top: 6rem;">
+    <a x-on:click="makeAppoitment = true; selectedServiceName = null; selectedServiceNameSlug = null; window.scrollTo(0, 0);" class="button is-secondary is-medium">
+        <strong class="is-underlined">Poti face o programare online aici</strong>
+    </a>
+</div>
+
+
+{%- endmacro %}

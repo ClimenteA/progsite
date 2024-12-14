@@ -1,0 +1,76 @@
+{% macro render(data) -%}
+
+
+<div class="columns mt-6">
+
+    <div class="column is-two-fifths is-align-self-center">
+
+        <div class="panel">
+
+            <p class="panel-heading">
+                Alege un serviciu
+            </p>
+
+            {% for s in data.services %}
+            <a class="panel-block" x-on:click="currentIndex = {{loop.index0}}">
+
+                <svg x-bind:class="currentIndex == {{loop.index0}} ? 'has-text-primary': 'is-hidden'"
+                    xmlns="http://www.w3.org/2000/svg" class="mr-2" width="12" height="12" fill="currentColor"
+                    viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                        d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
+                </svg>
+
+                <p x-bind:class="currentIndex == {{loop.index0}} ? 'title is-6': ''">{{s.name}}</p>
+            </a>
+            {% endfor %}
+
+        </div>
+    </div>
+
+    <div class="column">
+
+        {% for s in data.services %}
+
+        <div x-bind:class="currentIndex == {{loop.index0}} ? '': 'is-hidden'" class="card">
+
+            <div class="card-image">
+                <figure style="position: relative;" class="image is-16by9">
+                    <img style="object-fit: cover;" src="{{s.picture}}" alt="{{s.name}}">
+
+                    <div style="position: absolute; right: 1rem; top: 1rem;"
+                        class="tags are-medium has-addons big-shadow">
+                        <span class="tag is-dark">{{ s.name }}</span>
+                        {% if s.price != None %}
+                        <span class="tag is-grey">{{ s.price }} {{ s.currency }}</span>
+                        {% endif %}
+                    </div>
+
+                </figure>
+            </div>
+
+            <div class="card-content">
+                <div class="content">
+                    <p class="is-size-6-mobile">
+                        {{ s.description }}
+                    </p>
+                </div>
+            </div>
+
+            <footer class="card-footer">
+                <a x-bind:class="loading ? 'is-loading' : ''" x-on:click="selectedServiceName = '{{ s.name }}'; selectedServiceNameSlug = '{{s.slug_name}}'; showAvailability(); window.scrollTo(0, 0);"
+                    class="button is-medium card-footer-item is-primary has-text-weight-bold">
+                    Vreau o programare ✋
+                </a>
+            </footer>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+
+{%- endmacro %}

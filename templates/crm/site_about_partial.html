@@ -1,0 +1,23 @@
+{% macro render(data) -%}
+
+
+<div class="container" style="border-bottom: 1px solid lightgray; margin-top: 5rem;"></div>
+
+
+<section id="about" class="container">
+
+    <hgroup class="is-flex is-flex-direction-column is-align-items-center py-6">
+        <h1 class="title is-family-monospace">DESPRE NOI</h1>
+        <h2 class="subtitle has-text-grey-dark mt-2 has-text-centered px-1 is-size-6-mobile">
+            {{ data.about.about_us }}
+        </h2>
+    </hgroup>
+
+    <figure class="is-flex is-justify-content-center">
+        <img style="border-radius: 5px; max-height: 600px;" class="image" src="{{ data.about.team_picture }}" alt="">
+    </figure>
+
+</section>
+
+
+{%- endmacro %}

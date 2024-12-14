@@ -1,0 +1,148 @@
+{% macro render(data) -%}
+
+
+<div class="container" style="border-bottom: 1px solid lightgray;margin-top: 6rem;"></div>
+
+<section class="container">
+
+    <hgroup class="is-flex is-flex-direction-column is-align-items-center py-6">
+        <h1 class="title is-family-monospace">UNDE NE POTI GASI</h1>
+        <h2 class="subtitle has-text-grey-dark has-text-centered mt-2 px-1 is-size-6-mobile">
+            Click/Tap pe imagine pentru a deschide Google Maps
+        </h2>
+    </hgroup>
+
+    <figure class="is-flex is-justify-content-center mt-6">
+        <a href="{{ data.contact.google_maps_location_link }}" target="_blank">
+            <img class="image" style="border-radius: 5px;" src="{{ data.contact.google_maps_location_picture }}" alt="">
+        </a>
+    </figure>
+
+    <div class="is-flex is-justify-content-center">
+
+        <div class="columns mt-6">
+
+            <address class="column is-two-fifths is-align-self-center mx-2">
+                <p class="title is-5">Date de contact:</p>
+                <p> <span class="has-text-weight-bold mt-2">Adresa:</span> {{ data.contact.address }}</p>
+                {% if data.contact.phone %}
+                <p> <span class="has-text-weight-bold mt-2">Telefon:</span> {{ data.contact.phone }}</p>
+                {% endif %}
+                <p> <span class="has-text-weight-bold mt-2">Email:</span> {{ data.contact.email }}</p>
+
+
+                {% if data.working_schedule %}
+
+                <p class="title is-5 mt-6">Program de lucru:</p>
+
+                <ul>
+
+                    {% if data.working_schedule.monday_entries %}
+
+                    <h6 class="has-text-weight-bold mt-2">
+                        Luni:
+                    </h6>
+                    {% for t in data.working_schedule.monday_entries %}
+                    <li>{{t.start}} - {{ t.stop }}</li>
+
+                    {% endfor %}
+
+                    {% else %}
+
+                    <h6 class="has-text-weight-bold mt-2">
+                        Luni: Inchis
+                    </h6>
+
+                    {% endif %}
+
+                </ul>
+
+                <ul>
+                    {% if data.working_schedule.tuesday_entries %}
+                    <h6 class="has-text-weight-bold mt-2">Marti:</h6>
+                    {% for t in data.working_schedule.tuesday_entries %}
+                    <li>{{t.start}} - {{ t.stop }}</li>
+                    {% endfor %}
+                    {% else %}
+                    <h6 class="has-text-weight-bold mt-2">Marti: Inchis</h6>
+                    {% endif %}
+                </ul>
+
+
+                <ul>
+                    {% if data.working_schedule.wednesday_entries %}
+                    <h6 class="has-text-weight-bold mt-2">Miercuri:</h6>
+                    {% for t in data.working_schedule.wednesday_entries %}
+                    <li>{{t.start}} - {{ t.stop }}</li>
+                    {% endfor %}
+                    {% else %}
+                    <h6 class="has-text-weight-bold mt-2">Miercuri: Inchis</h6>
+                    {% endif %}
+                </ul>
+
+                <ul>
+                    {% if data.working_schedule.thursday_entries %}
+                    <h6 class="has-text-weight-bold mt-2">Joi:</h6>
+                    {% for t in data.working_schedule.thursday_entries %}
+                    <li>{{t.start}} - {{ t.stop }}</li>
+                    {% endfor %}
+                    {% else %}
+                    <h6 class="has-text-weight-bold mt-2">Joi: Inchis</h6>
+                    {% endif %}
+                </ul>
+
+                <ul>
+                    {% if data.working_schedule.friday_entries %}
+                    <h6 class="has-text-weight-bold mt-2">Vineri:</h6>
+                    {% for t in data.working_schedule.friday_entries %}
+                    <li>{{t.start}} - {{ t.stop }}</li>
+                    {% endfor %}
+                    {% else %}
+                    <h6 class="has-text-weight-bold mt-2">Vineri: Inchis</h6>
+                    {% endif %}
+                </ul>
+
+                <ul>
+                    {% if data.working_schedule.saturday_entries %}
+                    <h6 class="has-text-weight-bold mt-2">Sambata:</h6>
+                    {% for t in data.working_schedule.saturday_entries %}
+                    <li>{{t.start}} - {{ t.stop }}</li>
+                    {% endfor %}
+                    {% else %}
+                    <h6 class="has-text-weight-bold mt-2">Sambata: Inchis</h6>
+                    {% endif %}
+                </ul>
+
+                <ul>
+                    {% if data.working_schedule.sunday_entries %}
+                    <h6 class="has-text-weight-bold mt-2">Duminica:</h6>
+                    {% for t in data.working_schedule.sunday_entries %}
+                    <li>{{t.start}} - {{ t.stop }}</li>
+                    {% endfor %}
+                    {% else %}
+                    <h6 class="has-text-weight-bold mt-2">Duminica: Inchis</h6>
+                    {% endif %}
+                </ul>
+
+                {% if data.working_schedule.mentions %}
+                <p class="mt-4">
+                    {{ data.working_schedule.mentions }}
+                </p>
+                {% endif %}
+
+                {% endif %}
+            </address>
+
+
+            <figure class="column">
+                <img class="image" style="border-radius: 5px;" src="{{ data.contact.location_picture }}" alt="">
+            </figure>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+{%- endmacro %}

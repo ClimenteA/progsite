@@ -1,0 +1,194 @@
+{% extends "crm/base.html" %}
+
+
+{% block content %}
+
+<style>
+    form {
+        max-width: 400px;
+    }
+</style>
+
+<script>
+
+    function register() {
+        let inviteToken = "{{invite_token}}"
+        if (inviteToken.length != "edb22f66c42b4caeaa56c8db14080cd6".length) {
+            inviteToken = null
+        }
+
+        return {
+            loading: false,
+            username: null,
+            phone: null,
+            email: null,
+            password: null,
+            confirm_password: null,
+            error_message: null,
+            agreed_toc: false,
+            invite_token: inviteToken,
+            businessType: null,
+            register_url: document.location.origin + "/crm/users/register",
+            save: async function () {
+
+                if (!this.agreed_toc) {
+                    this.error_message = "Trebuie sa citesti si sa fii de acord cu termenii si conditiile websitului."
+                    setTimeout(() => { this.error_message = null }, 5000)
+                    return
+                }
+
+                this.error_message = null
+
+                if (this.password != this.confirm_password) {
+                    this.error_message = "Parolele trebuie sa fie la fel"
+                    setTimeout(() => { this.error_message = null }, 5000)
+                    return
+                }
+
+                this.loading = true
+     
+                const payload = {
+                    username: this.username,
+                    password: this.password,
+                    phone: this.phone,
+                    email: this.email,
+                    invite_token: this.invite_token,
+                    business_type: this.businessType
+                }
+
+                const response = await fetch(this.register_url, {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+
+                const result = await response.json()
+
+                this.loading = false
+
+                if (result.status_code == 200) {
+                    document.location = "/crm/users/login"
+                } else {
+                    this.error_message = result.content
+                }
+
+            }
+        }
+    }
+
+</script>
+
+
+<main x-data="register">
+
+    <div>
+        <div class="is-flex is-justify-content-center m-0">
+
+            <form @submit.prevent="save" class="box has-background-light mt-6">
+
+                <h1 class="title is-4 has-text-grey mb-6">Creeaza un cont</h1>
+
+                <div class="field">
+                    <label class="label">Nume Complet</label>
+                    <div class="control">
+                        <input x-model="username" class="input" placeholder="Alin Dragu" type="text" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Numar telefon mobil</label>
+                    <div class="control">
+                        <input x-model="phone" class="input" placeholder="ex: 0724789987" maxlength="10" type="tel"
+                            required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Adresa de email</label>
+                    <div class="control">
+                        <input x-model="email" class="input" placeholder="ex: alindragu@gmail.com" type="email"
+                            required>
+                    </div>
+                </div>
+
+                <div x-cloak x-show="!invite_token" class="field">
+
+                    <label class="label">Tipul afacerii</label>
+                    <div class="control">
+                        <input x-model="businessType" class="input" type="text" placeholder="Ex: SERVICE AUTO"
+                            list="biznis-types">
+                    </div>
+
+                    <datalist id="biznis-types">
+                        <option value="SERVICE AUTO">
+                        <option value="CABINET DENTAR">
+                        <option value="CABINET VETERINAR">
+                        <option value="SALON BEAUTY">
+                        <option value="BARBER SHOP">
+                        <option value="TATUAJE">
+                        <option value="CABINET PSIHOLOGIC">
+                        <option value="OPTICA MEDICALA">
+                        <option value="RECUPERARE MEDICALA">
+                    </datalist>
+
+                </div>
+
+
+                <div class="field">
+                    <label class="label">Parola</label>
+                    <div class="control">
+                        <input x-model="password" class="input" type="password" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Confirma Parola</label>
+                    <div class="control">
+                        <input x-model="confirm_password" class="input" type="password" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="checkbox">
+                        <input type="checkbox" x-model="agreed_toc" x-bind:checked="agreed_toc">
+                        <span style="font-size: 12px;">
+                            Am citit si sunt de acord cu <a href="/">termenii si conditiile</a>
+                        </span>
+                    </label>
+                </div>
+
+
+                <div class="mt-4">
+                    <a style="font-size: 12px; margin-right: 1rem;" href="/crm/users/login">Am un cont</a>
+                    <a style="font-size: 12px;" href="/crm/contact">Am uitat parola</a>
+                </div>
+
+                <div class="mt-6 buttons is-grouped is-pulled-right">
+                    <button x-bind:class="loading ? 'is-loading': ''" type="submit" class="button is-link">
+                        Creeaza contul
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <div x-cloak x-bind:class="error_message != null ? '': 'is-hidden'" class="notification is-danger" style="
+            position: absolute;
+            bottom: 2rem;
+            max-width: 600px;
+            right: 1rem;
+        ">
+            <button x-on:click="error_message = null" class="delete"></button>
+            <p x-text="error_message"></p>
+        </div>
+    </div>
+
+</main>
+
+
+
+{% endblock content %}

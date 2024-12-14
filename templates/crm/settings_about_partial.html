@@ -1,0 +1,146 @@
+{% macro render(data) -%}
+
+
+<script>
+
+    function about() {
+        return {
+            loading: false,
+            about_us: `{{data.about.about_us}}`,
+            team_picture: "{{data.about.team_picture}}",
+            success_message: null,
+            error_message: null,
+            base64: null,
+            filename: "img.png",
+            aboutUrl: document.location.origin + '/crm/static/about',
+            save: async function () {
+
+                this.loading = true
+                this.success_message = null
+                this.error_message = null
+
+                const payload = {
+                    about_us: this.about_us,
+                    team_picture: this.base64 ? this.base64 : this.team_picture,
+                }
+
+                const response = await fetch(this.aboutUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+
+                const result = await response.json()
+
+                this.loading = false
+
+                if (result.status_code == 200) {
+                    this.success_message = result.content
+                    setTimeout(() => { this.success_message = null }, 3000)
+                } else {
+                    this.error_message = result.content
+                    setTimeout(() => { this.error_message = null }, 3000)
+                }
+
+            }
+        }
+    }
+
+</script>
+
+
+<div x-data="about">
+
+
+    <form @submit.prevent="save" x-cloak x-bind:class="activeSection == 'about' ? '': 'is-hidden'"
+        class="box has-background-light mt-6">
+
+        <hgroup class="mb-6">
+            <h1 class="title is-5 is-family-monospace mb-2">Sectiune Istoric Afacere si Valori</h1>
+            <p class="mb-2">
+                Aici puteti elabora cu ce va diferentiati fata de competitori. 
+                Si care sunt principiile dupa care va ghidati in executarea serviciilor.
+                Adaugati o poza cu echipa sau cu dvs. daca lucrati independent. 
+            </p>
+            <figure>
+                <img loading="lazy" class="image" src="/public/crm/sections/4aboutus.png" alt="about">
+            </figure>
+        </hgroup>
+
+
+        <div class="field">
+            <label class="label">Despre noi</label>
+            <div class="control">
+                <textarea class="textarea" x-model="about_us"
+                    placeholder="Ex: Suntem pe piata din 2010. Avem deja experienta cu sute de clienti. Multi dintre ei s-au reintors la noi datorita serviciilor de inalta calitate oferite."></textarea>
+            </div>
+        </div>
+
+
+        <div class="field">
+
+            <div class="file has-name">
+                <label class="file-label">
+                    <input @change="
+                team_picture = $event.target.files[0]; 
+                filename = $event.target.files[0].name;
+                let reader = new FileReader(); 
+                reader.onload = () => { base64 = reader.result; }; 
+                reader.readAsDataURL(team_picture);
+                " class="file-input" type="file" accept="image/*">
+                    <span class="file-cta">
+                        <span class="file-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                viewBox="0 0 16 16">
+                                <path
+                                    d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
+                                <path
+                                    d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z" />
+                            </svg>
+                        </span>
+                        <span class="file-label">
+                            Incarca o imagine
+                        </span>
+                    </span>
+                    <span class="file-name" x-text="filename">
+                    </span>
+                </label>
+            </div>
+        </div>
+
+
+        <div class="field is-grouped is-grouped-right">
+            <button type="submit" x-bind:class="loading ? 'is-loading' : ''" class="button is-link">
+                Salveaza
+            </button>
+        </div>
+
+    </form>
+
+
+    <div x-cloak x-bind:class="error_message != null ? '': 'is-hidden'" class="notification is-danger" style="
+position: fixed;
+bottom: 2rem;
+max-width: 600px;
+left: 1rem;
+">
+        <button x-on:click="error_message = null" class="delete"></button>
+        <p x-text="error_message"></p>
+    </div>
+
+    <div x-cloak x-bind:class="success_message != null ? '': 'is-hidden'" class="notification is-success" style="
+    position: fixed;
+    bottom: 2rem;
+    max-width: 600px;
+    left: 1rem;
+    ">
+        <button x-on:click="success_message = null" class="delete"></button>
+        <p x-text="success_message"></p>
+    </div>
+
+
+</div>
+
+{%- endmacro %}

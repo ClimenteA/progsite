@@ -1,0 +1,137 @@
+{% import "crm/site_cookies_partial.html" as cookies %}
+{% import "crm/site_gdpr_partial.html" as gdpr %}
+{% import "crm/site_toc_partial.html" as toc %}
+{% import "crm/site_svglogo_partial.html" as svglogo %}
+
+
+{% macro render(data) -%}
+
+
+<div class="container" style="border-bottom: 1px solid lightgray;margin-top: 12rem;"></div>
+
+
+
+<div>
+
+
+    <footer class="container my-6 px-2">
+
+        <div class="columns mt-6">
+
+            <div class="column mr-6">
+
+                <a class="is-flex is-align-items-center" x-on:click="makeAppoitment = false; selectedServiceName = null; selectedServiceNameSlug = null; window.scrollTo(0, 0);">
+
+                    {{ svglogo.render(data) }}
+
+                    <strong style="font-size: large; margin-left:5px;">{{data.call_to_action.business_name}}</strong>
+                </a>
+
+                <a class="button is-primary is-medium mt-4" x-on:click="makeAppoitment = true; selectedServiceName = null; selectedServiceNameSlug = null; window.scrollTo(0, 0);">
+                    <strong>Fa o programare online</strong>
+                </a>
+
+            </div>
+
+
+            <div class="column">
+                <div class="is-flex is-flex-direction-column">
+                    <h4 class="has-text-weight-bold">Link-uri</h4>
+                    <a class="py-1" href="#about" x-bind:class="makeAppoitment ? 'has-text-grey': ''">Despre noi</a>
+                    <a class="py-1" href="#services" x-bind:class="makeAppoitment ? 'has-text-grey': ''">Servicii</a>
+                </div>
+            </div>
+
+            {% if data.external_links %}
+
+            <div class="column">
+                <div class="is-flex is-flex-direction-column">
+                    <h4 class="has-text-weight-bold">Link-uri externe</h4>
+
+                    {% for l in data.external_links %}
+                    <a class="py-1" href="{{l.link}}" target="_blank">{{ l.name }}</a>
+                    {% endfor %}
+
+                </div>
+            </div>
+
+            {% endif %}
+
+            <div class="column">
+                <div class="is-flex is-flex-direction-column">
+                    <h4 class="has-text-weight-bold">Legal</h4>
+                    <a class="py-1" x-on:click="modal = 'cookies'; active = true;">Cookies</a>
+                    <a class="py-1" x-on:click="modal = 'gdpr'; active = true;">GDPR</a>
+                    <a class="py-1" x-on:click="modal = 'toc'; active = true;">Termeni si conditii</a>
+                </div>
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <div x-cloak x-bind:class="modal == 'cookies' && active ? 'is-active': ''" class="modal">
+        <div x-on:click="modal = null; active = false;" class="modal-background"></div>
+
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Cookies</p>
+                <button x-on:click="modal = null; active = false;" class="delete" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                {{ cookies.render(data) }}
+            </section>
+            <footer class="modal-card-foot">
+                <button x-on:click="modal = null; active = false;" class="button is-primary">Am inteles</button>
+            </footer>
+        </div>
+
+    </div>
+
+
+    <div x-cloak x-bind:class="modal == 'gdpr' && active ? 'is-active': ''" class="modal">
+        <div x-on:click="modal = null; active = false;" class="modal-background"></div>
+
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Politica de Confidentialitate (GDPR)</p>
+                <button x-on:click="modal = null; active = false;" class="delete" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                {{ gdpr.render(data) }}
+            </section>
+            <footer class="modal-card-foot">
+                <button x-on:click="modal = null; active = false;" class="button is-primary">Am inteles</button>
+            </footer>
+        </div>
+
+    </div>
+
+
+
+    <div x-cloak x-bind:class="modal == 'toc' && active ? 'is-active': ''" class="modal">
+        <div x-on:click="modal = null; active = false;" class="modal-background"></div>
+
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Termeni si conditii</p>
+                <button x-on:click="modal = null; active = false;" class="delete" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                {{ toc.render(data) }}
+            </section>
+            <footer class="modal-card-foot">
+                <button x-on:click="modal = null; active = false;" class="button is-primary">Am inteles</button>
+            </footer>
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+
+{%- endmacro %}

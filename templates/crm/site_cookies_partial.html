@@ -1,0 +1,73 @@
+{% macro render(data) -%}
+
+<div class="content">
+    <h2>Politica de Cookie-uri pentru {{ data.business_name }}</h2>
+
+    <p>
+        Această politică de cookie-uri explică ce sunt cookie-urile și cum le folosim. Ar trebui să
+        citești această politică pentru a înțelege ce sunt cookie-urile, cum le folosim, tipurile de
+        cookie-uri pe care le folosim, adică informațiile pe care le colectăm folosind cookie-urile și
+        cum sunt utilizate aceste informații și cum să controlezi preferințele cookie-urilor. Pentru mai
+        multe informații despre cum folosim, stocăm și păstrăm datele tale personale în siguranță, vezi
+        Politica noastră de Confidențialitate.
+    </p>
+
+    <h4>Ce sunt cookie-urile?</h4>
+
+    <p>
+        Cookie-urile sunt mici fișiere text care sunt utilizate pentru a stoca mici bucăți de
+        informații. Cookie-urile sunt stocate pe dispozitivul tău atunci când site-ul web este încărcat
+        pe browserul tău. Aceste cookie-uri ne ajută să facem site-ul să funcționeze corect, să-l facem
+        mai sigur, să oferim o experiență de utilizator mai bună și să înțelegem cum funcționează
+        site-ul web și să analizăm ce funcționează și unde are nevoie de îmbunătățiri.
+    </p>
+
+    <h4>Cum folosim cookie-urile?</h4>
+
+    <p>
+        Site-ul nostru folosește doar cookie-uri de autorizare (JWT token). Un token JWT este un șir de litere și numere
+        generat de server după ce utilizatorul s-a autentificat, fiind folosit pentru a autoriza următoarele solicitări
+        ale utilizatorului către server. Acestea sunt necesare pentru
+        ca site-ul web să asigure securitatea utilizatorilor care au un cont.
+        Folosim si localStorage pentru a salva informatia daca ati citit sau nu cookies.
+
+        Datele personale sunt colectate doar dacă sunt trimise prin formularul de programări online
+        și sunt folosite doar în scopul comunicării directe cu utilizatorul. Datele personale colectate prin formularul
+        de programări online sunt numele utilizatorului și numărul de telefon. Datele sunt securizate pe server -
+        accesul la aceste date nu este permis decât personalului autorizat. De asemenea, datele în tranzit sunt criptate
+        folosind tehnologia SSL/TLS, astfel încât datele nu pot fi citite de terțe părți. Folosim cele mai bune practici
+        de securizare a serverului, astfel încât doar personalul autorizat poate avea acces. Niciun server din lume nu
+        este ferit de hackeri, dacă se întâmplă ca serverul să fie compromis, vom anunța utilizatorii în cel mai scurt
+        timp posibil și vom încerca să remediem vulnerabilitatea în cel mai scurt timp.
+    </p>
+
+    <h4>Ce tipuri de cookie-uri folosim?</h4>
+
+    <p>
+        Cookie-uri esențiale: Folosim cookies doar pentru a salva tokenul JWT, care este esențial pentru
+        autorizarea utilizatorului.
+    </p>
+
+    <h4>Cum pot controla preferințele cookie-urilor?</h4>
+
+    <p>
+        Poți oricând să ștergi Cookies și toate datele stocate de acest site din pagina de Setări a
+        Browserului pe care îl folosești. Poți căuta pe internet informații legate de cookies și cum le
+        poți șterge în funcție de browserul pe care îl folosești.
+    </p>
+
+    <p>
+        Nu folosim cookie-uri de la terți.
+    </p>
+
+    <h4>Drepturile utilizatorilor</h4>
+
+    <p>
+        Datele personale sunt utilizate doar în scopul onorării programării online. 
+        Datele personale sunt automat sterse dupa ce programarea online a expirat.
+    </p>
+
+</div>
+
+
+{%- endmacro %}

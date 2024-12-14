@@ -1,0 +1,137 @@
+{% macro render(data) -%}
+
+
+<div x-cloak x-data="{cookiesRead: false}" x-init="cookiesRead = localStorage.getItem('cookiesRead') == 'true';">
+
+    <p x-bind:class="cookiesRead ? 'is-hidden': ''" class="is-flex is-justify-content-center py-2 pl-2 has-background-warning">
+
+        <span>
+            Navigand pe acest website sunteti de acord cu
+            <a class="ml-1" x-on:click="modal = 'cookies'; active = true;">politica cookies.</a>
+        </span>
+
+        <span class="is-flex is-align-items-center">
+            <button x-on:click="cookiesRead = true; localStorage.setItem('cookiesRead', 'true')"
+                class="ml-2 delete is-small"></button>
+        </span>
+
+    </p>
+
+</div>
+
+
+{% if data.announcement %}
+
+<p class="has-background-light has-text-dark has-text-weight-bold py-1 has-text-centered">
+    {{data.announcement.message}}
+</p>
+
+{% endif %}
+
+
+<script>
+
+    function appointmentMade(){
+        return {
+            authorized: false,
+            apmtMade: null,
+            apmtCanceled: null,
+            apmtId: null,
+            cancelAppointmentUrl: document.location.origin + "/crm/appointments/cancel/{{ data.tenant_id }}",
+            getAppointmentUrl: document.location.origin + "/crm/appointments/active/{{ data.tenant_id }}",
+            deleteAppointment: async function(){
+
+                const response = await fetch(this.cancelAppointmentUrl + `/${this.apmtId}`, {
+                    method: "PUT",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+
+                const result = await response.json()
+
+                if (result.status_code == 200) {
+                    this.apmtId = null
+                    this.apmtMade = null
+                    this.apmtCanceled = true
+                    localStorage.removeItem("programare-{{ data.tenant_id }}")
+                    setTimeout(() => {this.apmtCanceled = null}, 5000) 
+                } else {
+                    this.apmtCanceled = false
+                }
+
+            },
+            checkIfAppointmentMade: async function(){
+
+                if (this.authorized) {
+                    return
+                }
+
+                this.apmtId = localStorage.getItem("programare-{{ data.tenant_id }}")
+                if (!this.apmtId) {
+                    return
+                }
+
+                const response = await fetch(this.getAppointmentUrl + `/${this.apmtId}`, {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+
+                const result = await response.json()
+
+                if (result.status_code == 200) {
+                    this.apmtMade = result.content
+                    this.apmtMade.selected_service_slug = this.apmtMade.selected_service_slug.replace(/-/g, " ")
+                } 
+            }
+        }
+    }
+
+</script>
+
+<div x-data="appointmentMade" x-init="checkIfAppointmentMade">
+
+    <div x-cloak x-show="apmtMade" class="has-background-warning has-text-dark has-text-weight-bold py-2 has-text-centered">
+        <p>
+            Ai o programare activa!
+        </p>
+
+        <div x-data="{confirmDelete: false}" class="my-2">
+
+            <button x-on:click="confirmDelete = true" x-show="!confirmDelete" class="button is-small is-danger is-light">
+                Anuleaza programarea
+            </button>
+
+            <button x-cloak x-show="confirmDelete" x-on:click="deleteAppointment" class="button is-small is-danger is-light">
+                Anuleaza acum!
+            </button>
+
+            <button x-cloak x-show="confirmDelete" x-on:click.prevent="confirmDelete = false" class="button is-small is-success is-light">
+                M-am razgandit
+            </button>
+
+        </div>
+    
+        <p x-text="apmtMade?.selected_service_slug"></p>
+        <p>
+            Data: 
+            <strong x-text="apmtMade?.day"></strong>. 
+            Interval orar: 
+            <strong x-text="apmtMade?.hour_interval"></strong>
+        </p>
+    </div>
+
+    <p x-cloak x-show="apmtCanceled == true" class="has-background-warning has-text-dark has-text-weight-bold py-2 has-text-centered">
+        Programarea a fost anulata
+    </p>
+
+    <p x-cloak x-show="apmtCanceled == false" class="has-background-warning has-text-dark has-text-weight-bold py-2 has-text-centered">
+        Programarea nu a putut fi anulata. Reincarca pagina si incearca din nou.
+    </p>
+
+</div>
+
+
+{%- endmacro %}

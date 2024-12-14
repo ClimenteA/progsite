@@ -1,0 +1,406 @@
+{% macro render(data) -%}
+
+
+
+<hgroup class="mt-6 mx-1">
+    <h1 class="title is-4">Selecteaza un interval de timp</h1>
+    <h2 class="subtitle is-6">
+        Alege cand esti desponibil pentru serviciul:
+        <strong x-text="selectedServiceName"></strong>
+    </h2>
+</hgroup>
+
+<div class="mt-6">
+
+    <h1 class="mb-5">
+        <svg class="has-text-primary" xmlns="http://www.w3.org/2000/svg" class="mr-2" width="18" height="18"
+            fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+                d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
+        </svg>
+        <span class="title is-4 has-text-grey">
+            Saptamana curenta
+        </span>
+    </h1>
+
+    <div class="columns is-mobile inner-shadow overflow-hidden is-unselectable px-4 py-4">
+
+        <div class="column w-fit-content">
+            <div class="panel">
+                <p 
+                x-text="availability.current_week.monday.day" 
+                class="panel-heading" 
+                style="font-size: 14px;">
+                </p>
+
+                <template x-for="entry in availability.current_week.monday.entries">
+                    <a
+                    x-on:click="selectInterval(entry, availability.current_week.monday.day)"
+                    x-bind:class="entry.available ? '': 'has-text-grey-lighter unavailable'" 
+                        class="panel-block is-justify-content-center">
+                        <p x-text="entry.hour_interval"></p>
+                    </a>
+                </template>
+            </div>
+        </div>
+
+
+        <div class="column w-fit-content">
+            <div class="panel">
+                <p 
+                x-text="availability.current_week.tuesday.day"
+                class="panel-heading" 
+                style="font-size: 14px;">
+                </p>
+
+                <template x-for="entry in availability.current_week.tuesday.entries">
+                    <a
+                    x-on:click="selectInterval(entry, availability.current_week.tuesday.day)"
+                    x-bind:class="entry.available ? '': 'has-text-grey-lighter unavailable'" 
+                        class="panel-block is-justify-content-center">
+                        <p x-text="entry.hour_interval"></p>
+                    </a>
+                </template>
+            </div>
+        </div>
+
+
+        <div class="column w-fit-content">
+            <div class="panel">
+                <p 
+                x-text="availability.current_week.wednesday.day" 
+                class="panel-heading" 
+                style="font-size: 14px;">
+                </p>
+
+                <template x-for="entry in availability.current_week.wednesday.entries">
+                    <a
+                    x-on:click="selectInterval(entry, availability.current_week.wednesday.day)"
+                    x-bind:class="entry.available ? '': 'has-text-grey-lighter unavailable'" 
+                        class="panel-block is-justify-content-center">
+                        <p x-text="entry.hour_interval"></p>
+                    </a>
+                </template>
+            </div>
+        </div>
+
+
+        <div class="column w-fit-content">
+            <div class="panel">
+                <p 
+                x-text="availability.current_week.thursday.day" 
+                class="panel-heading" 
+                style="font-size: 14px;">
+                </p>
+
+                <template x-for="entry in availability.current_week.thursday.entries">
+                    <a
+                    x-on:click="selectInterval(entry, availability.current_week.thursday.day)"
+                    x-bind:class="entry.available ? '': 'has-text-grey-lighter unavailable'" 
+                        class="panel-block is-justify-content-center">
+                        <p x-text="entry.hour_interval"></p>
+                    </a>
+                </template>
+            </div>
+        </div>
+
+
+        <div class="column w-fit-content">
+            <div class="panel">
+                <p 
+                x-text="availability.current_week.friday.day" 
+                class="panel-heading" 
+                style="font-size: 14px;">
+                </p>
+
+                <template x-for="entry in availability.current_week.friday.entries">
+                    <a
+                    x-on:click="selectInterval(entry, availability.current_week.friday.day)"
+                    x-bind:class="entry.available ? '': 'has-text-grey-lighter unavailable'" 
+                        class="panel-block is-justify-content-center">
+                        <p x-text="entry.hour_interval"></p>
+                    </a>
+                </template>
+            </div>
+        </div>
+
+
+        <div class="column w-fit-content">
+            <div class="panel">
+                <p 
+                x-text="availability.current_week.saturday.day" 
+                class="panel-heading" 
+                style="font-size: 14px;">
+                </p>
+
+                <template x-for="entry in availability.current_week.saturday.entries">
+                    <a
+                    x-on:click="selectInterval(entry, availability.current_week.saturday.day)"
+                    x-bind:class="entry.available ? '': 'has-text-grey-lighter unavailable'" 
+                        class="panel-block is-justify-content-center">
+                        <p x-text="entry.hour_interval"></p>
+                    </a>
+                </template>
+            </div>
+        </div>
+
+
+        <div class="column w-fit-content">
+            <div class="panel">
+                <p 
+                x-text="availability.current_week.sunday.day" 
+                class="panel-heading" 
+                style="font-size: 14px;">
+                </p>
+
+                <template x-for="entry in availability.current_week.sunday.entries">
+                    <a
+                    x-on:click="selectInterval(entry, availability.current_week.sunday.day)"
+                    x-bind:class="entry.available ? '': 'has-text-grey-lighter unavailable'" 
+                        class="panel-block is-justify-content-center">
+                        <p x-text="entry.hour_interval"></p>
+                    </a>
+                </template>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="mt-6">
+
+    <h1 class="mb-5">
+        <svg class="has-text-primary" xmlns="http://www.w3.org/2000/svg" class="mr-2" width="18" height="18"
+            fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+                d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
+        </svg>
+        <span class="title is-4 has-text-grey">
+            Saptamana viitoare
+        </span>
+    </h1>
+
+
+    <div class="columns is-mobile inner-shadow overflow-hidden is-unselectable px-4 py-4">
+
+        <div class="column w-fit-content">
+            <div class="panel">
+                <p 
+                x-text="availability.next_week.monday.day" 
+                class="panel-heading" 
+                style="font-size: 14px;">
+                </p>
+
+                <template x-for="entry in availability.next_week.monday.entries">
+                    <a
+                    x-on:click="selectInterval(entry, availability.next_week.monday.day)"
+                    x-bind:class="entry.available ? '': 'has-text-grey-lighter unavailable'" 
+                        class="panel-block is-justify-content-center">
+                        <p x-text="entry.hour_interval"></p>
+                    </a>
+                </template>
+            </div>
+        </div>
+
+
+        <div class="column w-fit-content">
+            <div class="panel">
+                <p 
+                x-text="availability.next_week.tuesday.day"
+                class="panel-heading" 
+                style="font-size: 14px;">
+                </p>
+
+                <template x-for="entry in availability.next_week.tuesday.entries">
+                    <a
+                    x-on:click="selectInterval(entry, availability.next_week.tuesday.day)"
+                    x-bind:class="entry.available ? '': 'has-text-grey-lighter unavailable'" 
+                        class="panel-block is-justify-content-center">
+                        <p x-text="entry.hour_interval"></p>
+                    </a>
+                </template>
+            </div>
+        </div>
+
+
+        <div class="column w-fit-content">
+            <div class="panel">
+                <p 
+                x-text="availability.next_week.wednesday.day" 
+                class="panel-heading" 
+                style="font-size: 14px;">
+                </p>
+
+                <template x-for="entry in availability.next_week.wednesday.entries">
+                    <a
+                    x-on:click="selectInterval(entry, availability.next_week.wednesday.day)"
+                    x-bind:class="entry.available ? '': 'has-text-grey-lighter unavailable'" 
+                        class="panel-block is-justify-content-center">
+                        <p x-text="entry.hour_interval"></p>
+                    </a>
+                </template>
+            </div>
+        </div>
+
+
+        <div class="column w-fit-content">
+            <div class="panel">
+                <p 
+                x-text="availability.next_week.thursday.day" 
+                class="panel-heading" 
+                style="font-size: 14px;">
+                </p>
+
+                <template x-for="entry in availability.next_week.thursday.entries">
+                    <a
+                    x-on:click="selectInterval(entry, availability.next_week.thursday.day)"
+                    x-bind:class="entry.available ? '': 'has-text-grey-lighter unavailable'" 
+                        class="panel-block is-justify-content-center">
+                        <p x-text="entry.hour_interval"></p>
+                    </a>
+                </template>
+            </div>
+        </div>
+
+
+        <div class="column w-fit-content">
+            <div class="panel">
+                <p 
+                x-text="availability.next_week.friday.day" 
+                class="panel-heading" 
+                style="font-size: 14px;">
+                </p>
+
+                <template x-for="entry in availability.next_week.friday.entries">
+                    <a
+                    x-on:click="selectInterval(entry, availability.next_week.friday.day)"
+                    x-bind:class="entry.available ? '': 'has-text-grey-lighter unavailable'" 
+                        class="panel-block is-justify-content-center">
+                        <p x-text="entry.hour_interval"></p>
+                    </a>
+                </template>
+            </div>
+        </div>
+
+
+        <div class="column w-fit-content">
+            <div class="panel">
+                <p 
+                x-text="availability.next_week.saturday.day" 
+                class="panel-heading" 
+                style="font-size: 14px;">
+                </p>
+
+                <template x-for="entry in availability.next_week.saturday.entries">
+                    <a
+                    x-on:click="selectInterval(entry, availability.next_week.saturday.day)"
+                    x-bind:class="entry.available ? '': 'has-text-grey-lighter unavailable'" 
+                        class="panel-block is-justify-content-center">
+                        <p x-text="entry.hour_interval"></p>
+                    </a>
+                </template>
+            </div>
+        </div>
+
+
+        <div class="column w-fit-content">
+            <div class="panel">
+                <p 
+                x-text="availability.next_week.sunday.day" 
+                class="panel-heading" 
+                style="font-size: 14px;">
+                </p>
+
+                <template x-for="entry in availability.next_week.sunday.entries">
+                    <a
+                    x-on:click="selectInterval(entry, availability.next_week.sunday.day)"
+                    x-bind:class="entry.available ? '': 'has-text-grey-lighter unavailable'" 
+                        class="panel-block is-justify-content-center">
+                        <p x-text="entry.hour_interval"></p>
+                    </a>
+                </template>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="mt-6 buttons is-pulled-right">
+
+    <button
+    x-on:click="selectedDay = 'Nedefinita'; selectedHourInterval = 'Nedefinita'"  
+    class="button is-primary is-light has-text-weight-bold">
+        ✋ Contacteaza-ma pentru o programare 
+    </button>
+
+    <button
+    x-on:click="makeAppoitment = false; selectedServiceName = null; selectedServiceNameSlug = null; window.scrollTo(0, 0);"  
+    class="button is-secondary is-light has-text-weight-bold">
+        Inapoi 
+    </button>
+
+</div>
+
+
+
+<div class="modal" x-bind:class="selectedDay && selectedHourInterval ? 'is-active': ''">
+    <div class="modal-background" ></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+        <p class="modal-card-title">Adauga datele de contact</p>
+        <button x-on:click="selectedDay= null; selectedHourInterval = null; showAvailability();" class="delete" aria-label="close"></button>
+        </header>
+        <section class="modal-card-body">
+            <p>Serviciul: <strong x-text="selectedServiceName"></strong>
+                <br>
+                Data: <strong x-text="selectedDay"></strong>. Ora: <strong x-text="selectedHourInterval"></strong>
+            </p>
+
+            <form class="my-6">
+
+                <div class="field">
+                    <label class="label">Nume</label>
+                    <div class="control">
+                        <input x-model="fullName" class="input" placeholder="Ion Popescu" type="text" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Telefon</label>
+                    <div class="control">
+                        <input x-model="phone" class="input" placeholder="0724123123" type="tel" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Mesaj (Optional)</label>
+                    <div class="control">
+                        <textarea x-model="message" class="textarea" placeholder="Optional poti adauga alte detalii aici..."></textarea>
+                    </div>
+                </div>
+
+            </form>
+
+            <div x-bind:class="appointmentFailedMsg ? '': 'is-hidden'" class="notification is-danger">
+                <button x-on:click="appointmentFailedMsg = null;" class="delete"></button>
+                <p x-text="appointmentFailedMsg"></p>
+            </div>
+
+            <div x-bind:class="appointmentSuccessMsg ? '': 'is-hidden'" class="notification is-success">
+                <button x-on:click="appointmentSuccessMsg = null;" class="delete"></button>
+                <p x-text="appointmentSuccessMsg"></p>
+            </div>
+
+        </section>
+        <footer class="modal-card-foot">
+        <button x-on:click="setAppointment" class="button is-success">Salveaza programarea</button>
+        <button x-on:click="selectedDay= null; selectedHourInterval = null; showAvailability();" class="button">Inchide</button>
+        </footer>
+    </div>
+</div>
+
+
+{%- endmacro %}

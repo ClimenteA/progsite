@@ -1,0 +1,224 @@
+{% macro render(data) -%}
+
+<script>
+
+    function contact() {
+        return {
+            loading: false,
+            google_maps_location_link: "{{data.contact.google_maps_location_link}}",
+            google_maps_location_picture: "{{data.contact.google_maps_location_picture}}",
+            google_maps_location_picture_name: "img.png",
+            location_picture: "{{data.contact.location_picture}}",
+            location_picture_name: "img.png",
+            address: `{{data.contact.address}}`,
+            phone: `{{data.contact.phone}}`,
+            email: `{{data.contact.email}}`,
+            google_maps_location_picture_base64: null,
+            location_picture_base64: null,
+            success_message: null,
+            error_message: null,
+            contactUrl: document.location.origin + '/crm/static/contact',
+            save: async function () {
+
+                this.loading = true
+                this.success_message = null
+                this.error_message = null
+
+                const payload = {
+                    google_maps_location_link: this.google_maps_location_link,
+                    google_maps_location_picture: this.google_maps_location_picture_base64 ? this.google_maps_location_picture_base64 : this.google_maps_location_picture,
+                    location_picture: this.location_picture_base64 ? this.location_picture_base64 : this.location_picture,
+                    address: this.address,
+                    phone: this.phone,
+                    email: this.email,
+                }
+
+                const response = await fetch(this.contactUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+
+                const result = await response.json()
+
+                this.loading = false
+
+                if (result.status_code == 200) {
+                    this.success_message = result.content
+                    setTimeout(() => { this.success_message = null }, 3000)
+                } else {
+                    this.error_message = result.content
+                    setTimeout(() => { this.error_message = null }, 3000)
+                }
+
+            }
+        }
+    }
+
+</script>
+
+
+<div x-data="contact">
+
+    <form @submit.prevent="save" x-cloak x-bind:class="activeSection == 'contact' ? '': 'is-hidden'"
+        class="box has-background-light mt-6">
+
+        <hgroup class="mb-6">
+            <h1 class="title is-5 is-family-monospace mb-2">Sectiune Contact</h1>
+            <p class="mb-2">
+                Intrati pe <a href="https://www.google.com/maps">Google Maps</a>
+                Plasati un pin in locatia afacerii dvs. si copiati linkul catre acel pin.
+                Apoi, faceti si un screenshot din care clientul poate deduce unde se afla.
+                Adaugati si o poza cu locatia cladirii afacerii dvs. sau alta poza descriptiva.
+            </p>
+            <div class="columns">
+
+                <figure class="column">
+                    <img loading="lazy" class="image" src="/public/crm/sections/7gmapspin.png"
+                        alt="contact google maps">
+                </figure>
+
+                <figure class="column">
+                    <img loading="lazy" class="image" src="/public/crm/sections/8contact.png" alt="contact details">
+                </figure>
+
+            </div>
+
+        </hgroup>
+
+
+        <div class="field">
+            <label class="label">Link catre locatie pin Google Maps</label>
+            <div class="control">
+                <input class="input" x-model="google_maps_location_link" type="text"
+                    placeholder="Ex: https://maps.app.goo.gl/BuKbwrcq3jWRQzpW8">
+            </div>
+        </div>
+
+        <div class="is-flex is-flex-direction-column mb-6">
+
+            <div class="field">
+
+                <div class="file has-name mt-4">
+                    <label class="file-label">
+                        <input @change="
+                            google_maps_location_picture = $event.target.files[0]; 
+                            google_maps_location_picture_name = $event.target.files[0].name;
+                            let reader = new FileReader(); 
+                            reader.onload = () => { google_maps_location_picture_base64 = reader.result; }; 
+                            reader.readAsDataURL(google_maps_location_picture);
+                        " class="file-input" type="file" accept="image/*">
+                        <span class="file-cta">
+                            <span class="file-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    viewBox="0 0 16 16">
+                                    <path
+                                        d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
+                                    <path
+                                        d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z" />
+                                </svg>
+                            </span>
+                            <span class="file-label">
+                                Incarca screenshot google maps
+                            </span>
+                        </span>
+                        <span class="file-name" x-text="google_maps_location_picture_name">
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+
+            <div class="field">
+
+                <div class="file has-name">
+                    <label class="file-label">
+                        <input @change="
+                            location_picture = $event.target.files[0]; 
+                            location_picture_name = $event.target.files[0].name;
+                            let reader = new FileReader(); 
+                            reader.onload = () => { location_picture_base64 = reader.result; }; 
+                            reader.readAsDataURL(location_picture);
+                        " class="file-input" type="file" accept="image/*">
+                        <span class="file-cta">
+                            <span class="file-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    viewBox="0 0 16 16">
+                                    <path
+                                        d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
+                                    <path
+                                        d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z" />
+                                </svg>
+                            </span>
+                            <span class="file-label">
+                                Incarca screenshot cu locatia
+                            </span>
+                        </span>
+                        <span class="file-name" x-text="location_picture_name">
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="columns">
+
+            <div class="column field">
+                <label class="label">Adresa</label>
+                <div class="control">
+                    <input class="input" x-model="address" type="text" placeholder="Ex: Str. Coacazelor, Nr. 123, Iasi">
+                </div>
+            </div>
+
+            <div class="column field">
+                <label class="label">Telefon</label>
+                <div class="control">
+                    <input class="input" x-model="phone" type="text" placeholder="Ex: 0232-256-789">
+                </div>
+            </div>
+
+            <div class="column field">
+                <label class="label">Email</label>
+                <div class="control">
+                    <input class="input" x-model="email" type="text" placeholder="Ex: contact@bestauto.ro">
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="field is-grouped is-grouped-right mt-6">
+            <button type="submit" x-bind:class="loading ? 'is-loading' : ''" class="button is-link">
+                Salveaza date de contact
+            </button>
+        </div>
+
+    </form>
+
+
+    <div x-cloak x-bind:class="error_message != null ? '': 'is-hidden'" class="notification is-danger" style="
+position: fixed;
+bottom: 2rem;
+max-width: 600px;
+left: 1rem;
+">
+        <button x-on:click="error_message = null" class="delete"></button>
+        <p x-text="error_message"></p>
+    </div>
+
+    <div x-cloak x-bind:class="success_message != null ? '': 'is-hidden'" class="notification is-success" style="
+    position: fixed;
+    bottom: 2rem;
+    max-width: 600px;
+    left: 1rem;
+    ">
+        <button x-on:click="success_message = null" class="delete"></button>
+        <p x-text="success_message"></p>
+    </div>
+
+</div>
+
+{%- endmacro %}

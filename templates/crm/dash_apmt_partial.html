@@ -1,0 +1,70 @@
+{% macro render(apmt) -%}
+
+
+<article
+x-data="apmtHandler('{{apmt.tenant_id}}', '{{apmt.appointment_id}}', {{apmt.confirmed | lower }}, {{apmt.canceled | lower }})"
+class="card has-background-light mb-6">
+    <header class="card-header">
+        <p class="card-header-title">
+            {{ apmt.selected_service_name }}
+        </p>
+    </header>
+    <div class="card-content">
+        <div class="content">
+            
+            <p>
+                Data: <strong>{{ apmt.day }}. </strong> 
+                Orele: <strong>{{ apmt.hour_interval }}</strong> 
+            </p>
+
+            <p>
+                Client: <strong>{{ apmt.full_name }} </strong> 
+                <br>
+                Telefon: <strong>{{ apmt.phone }}</strong> 
+            </p>
+            {% if apmt.message %}
+            <p>
+                Mesaj de la client: 
+                <br>
+                <strong>
+                    {{ apmt.message }}
+                </strong>
+            </p>
+            {% else %}
+            <p>Nici un mesaj de la client.</p>
+            {% endif %}
+
+           
+
+            <p>
+                Programare validata:                         
+                <strong x-cloak x-show="confirmed" class="has-text-success">Da</strong>
+                <strong x-cloak x-show="!confirmed" class="has-text-danger">Nu</strong>
+    
+                <br>
+
+                Programare anulata: 
+                <strong x-cloak x-show="canceled" class="has-text-danger">Da</strong>
+                <strong x-cloak x-show="!canceled" class="has-text-success">Nu</strong>
+                
+            </p>
+
+            <small class="has-text-grey is-pulled-right" style="font-size: 12px !important;">Id: {{apmt.appointment_id}}</small> 
+            
+        </div>
+    </div>
+    <footer class="card-footer is-unselectable">
+        <a x-on:click="confirmAmpt" class="card-footer-item has-text-primary has-text-weight-bold">
+            Valideaza
+        </a>
+        <a href="/crm/website/{{ apmt.tenant_id }}#services" class="card-footer-item has-text-info has-text-weight-bold">
+            Reprogrameaza
+        </a>
+        <a x-on:click="cancelAmpt" class="card-footer-item has-text-danger has-text-weight-bold">
+            Anuleaza
+        </a>
+    </footer>
+</article>
+
+
+{%- endmacro %}

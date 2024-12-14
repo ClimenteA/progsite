@@ -1,0 +1,57 @@
+{% macro render(data) -%}
+
+<div class="content">
+    <h2>Termeni și Condiții pentru {{ data.business_name }}</h2>
+
+    <p>
+        Acești Termeni și Condiții reglementează utilizarea site-ului nostru și explică obligațiile și drepturile tale
+        ca utilizator. Te rugăm să citești cu atenție acești termeni înainte de a folosi site-ul nostru.
+    </p>
+
+    <h4>Descrierea serviciilor</h4>
+
+    <p>
+        Pe site-ul nostru, utilizatorii pot face o programare online în vederea onorării serviciilor cerute la data și
+        ora stabilită în programarea online.
+    </p>
+
+    <h4>Condițiile de utilizare a site-ului</h4>
+
+    <p>
+        Prin utilizarea site-ului nostru, ești de acord să nu folosești site-ul în scopuri ilegale sau interzise de
+        acești termeni. Nu ai voie să încarci sau să transmiți viruși sau orice alt tip de cod malitios. Nu ai voie să
+        colectezi sau să urmărești informațiile personale ale altor utilizatori.
+    </p>
+
+    <h4>Drepturile și obligațiile utilizatorilor</h4>
+
+    <p>
+        Utilizatorul trebuie să se prezinte la locație (prezenta pe site in sectiunea contact) la data și ora completată în formularul de programări online.
+        Daca utilizatorul nu se poate prezenta va trebui să anunțe pentru a anula programarea în cel mai scurt timp.
+    </p>
+
+    <h4>Drepturile și obligațiile {{ data.business_name }}</h4>
+
+    <p>
+        {{ data.business_name }} trebuie să fie prezent la locație pentru a onora programarile online.
+        Trebuie să anunțe utilizatorii pentru care nu se poate onora programarea online în cel mai scurt timp.
+    </p>
+
+    <h4>Politica de rezolvare a disputelor</h4>
+
+    <p>
+        În cazul unui litigiu, te rugăm să ne contactezi la {{ data.email }} și vom încerca să rezolvăm problema într-un
+        mod care să fie satisfăcător pentru ambele părți.
+    </p>
+
+    <h4>Contact</h4>
+
+    <p>
+        Dacă ai întrebări sau nelămuriri legate de acești termeni și condiții, te rugăm să ne contactezi la
+        {{ data.email }}.
+    </p>
+
+</div>
+
+
+{%- endmacro %}

@@ -1,0 +1,168 @@
+{% import "crm/dash_apmt_partial.html" as apmtComp %}
+
+{% macro render(data, active_appointments, pending_appointments, cancelled_appointments) -%}
+
+
+<script>
+
+    function adminAppointments(){
+        return {
+            tenant_id: "{{data.tenant_id}}",
+            activeSection: 'active-appointments',
+            appointmentFailedMsg: null,
+            appointmentSuccessMsg: null,
+            selectedService: null,
+            selectedDate: null,
+            selectedHour: null,
+            selectedServiceSlug: null,
+            refApmtId: null,
+            setApmtData: async function(apmtId, selectedServiceSlug){
+                this.refApmtId = apmtId
+                this.selectedServiceSlug = selectedServiceSlug
+            }
+        }
+    }
+
+</script>
+
+
+<main x-data="adminAppointments" class="container main-y-margin px-1">
+
+    <hgroup class="mb-6">
+        <h1 class="title is-3">Programari</h1>
+        <h2 class="subtitle has-text-grey is-size-6 mt-2">
+            Aici ai listate programarile in curs pentru urmatoarele 2 saptamani. 
+            Pentru a prelua programarile noi reincarca pagina din cand in cand.
+            <br>
+            Click pe <strong>'Valideaza'</strong> daca ai sunat clientul si ai confirmat ca el a facut programarea.
+            <br>
+            Click pe <strong>'Reprogrameaza'</strong> pentru a seta programarea pentru o alta zi/ora sau serviciu.
+            <br>
+            Click pe <strong>'Anuleaza'</strong> daca ai sunat clientul si ai anulat programarea sau programarea a fost invalida (numar de telefon invalid sau alte cauze).
+        </h2>
+    </hgroup>
+
+    <div class="tabs is-centered mt-6 py-4 px-4 custom-scroll-container">
+        <ul>
+            <li x-bind:class="activeSection == 'active-appointments' ? 'is-active': ''">
+                <a x-on:click="activeSection = 'active-appointments'">
+                    Programate ({{ active_appointments | count }})
+                </a>
+            </li>
+            <li x-bind:class="activeSection == 'pending-appointments' ? 'is-active': ''">
+                <a x-on:click="activeSection = 'pending-appointments'">
+                    Neprogramate ({{ pending_appointments | count }})
+                </a>
+            </li>
+            <li x-bind:class="activeSection == 'cancelled-appointments' ? 'is-active': ''">
+                <a x-on:click="activeSection = 'cancelled-appointments'">
+                    Anulate ({{ cancelled_appointments | count }})
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <script>
+        
+        function apmtHandler(tenant_id, apmtId, confirmed, canceled){
+
+            return () => {
+                return {
+                    tenant_id: tenant_id,
+                    apmtId: apmtId,
+                    confirmed: confirmed, 
+                    canceled: canceled,
+                    cancelAmptUrl: document.location.origin + "/crm/appointments/toggle-canceled",
+                    confirmAmptUrl: document.location.origin + "/crm/appointments/toggle-confirmed",
+                    cancelAmpt: async function(){
+
+                        let currentCanceled = !this.canceled
+
+                        const response = await fetch(this.cancelAmptUrl + `/${this.tenant_id}/${this.apmtId}/${currentCanceled}`, {
+                            method: "POST",
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                        })
+
+                        const result = await response.json()
+
+                        if (result.status_code == 200) {
+                            this.canceled = currentCanceled
+                        } 
+                    },
+                    confirmAmpt: async function(){
+
+                        let currentConfirmed = !this.confirmed
+
+                        const response = await fetch(this.confirmAmptUrl + `/${this.tenant_id}/${this.apmtId}/${currentConfirmed}`, {
+                            method: "POST",
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                        })
+
+                        const result = await response.json()
+
+                        if (result.status_code == 200) {
+                            this.confirmed = currentConfirmed
+                        } 
+
+                    },
+                }
+            } 
+        }
+
+    </script>
+
+    <div class="px-1" style="max-width: 900px; margin: 0 auto;">
+        
+        <section id="active-appointments" x-cloak x-bind:class="activeSection == 'active-appointments' ? '': 'is-hidden'" >
+
+            {% if active_appointments  %}
+            
+            {% for apmt in active_appointments %}
+                {{ apmtComp.render(apmt) }}
+            {% endfor %}
+        
+            {% else %}
+                <p class="has-text-centered">🤖 Nimic de afisat pentru moment</p>
+            {% endif %}
+        </section>
+
+        <section id="pending-appointments" x-cloak x-bind:class="activeSection == 'pending-appointments' ? '': 'is-hidden'" >
+
+            {% if pending_appointments  %}
+            
+            {% for apmt in pending_appointments %}
+
+            {{ apmtComp.render(apmt) }}
+
+            {% endfor %}
+        
+            {% else %}
+                <p class="has-text-centered">🤖 Nimic de afisat pentru moment</p>
+            {% endif %}
+        </section>
+
+        <section id="cancelled-appointments" x-cloak x-bind:class="activeSection == 'cancelled-appointments' ? '': 'is-hidden'" >
+
+            {% if cancelled_appointments  %}
+           
+            {% for apmt in cancelled_appointments %}
+
+            {{ apmtComp.render(apmt) }}
+
+            {% endfor %}
+        
+            {% else %}
+                <p class="has-text-centered">🤖 Nimic de afisat pentru moment</p>
+            {% endif %}
+        </section>
+
+    </div>
+
+</main>
+
+
+{%- endmacro %}
