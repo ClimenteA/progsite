@@ -2,7 +2,8 @@
 
 Landing page + Appointments in one website! Super useful for "brick and mortar" business that need to have an online presence and an appointment scheduler. Free to use!
 
-Contact me if you need help with this at [softgata.com](https://softgata.com/).
+Contact me if you need help with this at [softgata.com](https://softgata.com/). 
+Please note this is at beta stage.
 
 Features:
 - update landing page template with your text, images and external links;
@@ -36,6 +37,15 @@ Here the clients can make an appointment for the span of current day up to 2 wee
 
 ![appointments-page](readmepics/appointments-page.jpeg)
 
+When an user clicks on a hour interval he will need to fill this small contact form.
+
+![set-appointment](readmepics/set-appointment.png)
+
+Then you or an employee can see the scheduled appointments in Appointments page. You can Validate the apointment by calling the user and confirming, you can call the client and reschedule or cancel the appointment.
+
+In the Not scheduled tab you will see appointments that need to be done in the future (over 2 weeks from now).
+
+![be-appointments](readmepics/be-appointments.png)
 
 
 ## Settings
